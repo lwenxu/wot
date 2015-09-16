@@ -35,7 +35,6 @@ def new_onControlModeChanged(self, eMode, **args):
     else:
         BigWorld.wg_enableTreeHiding(False)
         BigWorld.wg_enableTreeTransparency(True)
-    return self.new_onControlModeChanged
 
 
 old_handleKey = PlayerAvatar.handleKey
