@@ -4,7 +4,6 @@ from CurrentVehicle import g_currentVehicle
 from gui.Scaleform.daapi.view.lobby.hangar.AmmunitionPanel import AmmunitionPanel
 from gui.ClientHangarSpace import ClientHangarSpace
 from gui.shared import g_itemsCache, REQ_CRITERIA
-from gui.shared.utils.requesters.deprecated import Requester
 from adisp import process
 from debug_utils import *
 from gui import SystemMessages
