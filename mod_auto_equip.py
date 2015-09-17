@@ -14,6 +14,7 @@ old_setVehicleModule = None
 old_recreateVehicle = None
 g_xmlSetting = None
 g_prevVehicle = None
+g_started = False
 
 
 def equipAllRemovableDevicesOnVehicle(vehicle):
@@ -47,11 +48,6 @@ def removeAllRemovableDevicesFromAllVehicle(curVehicle):
         pass
 
 
-def onCurrentVehicleChanged(prevVehicle, curVehicle):
-    removeAllRemovableDevicesFromAllVehicle(curVehicle)
-    equipAllRemovableDevicesOnVehicle(curVehicle)
-
-
 def equipCurrentVehicle():
     global g_prevVehicle
     if g_currentVehicle.isInHangar:
@@ -59,7 +55,8 @@ def equipCurrentVehicle():
         if g_prevVehicle is not curVehicle:
             if g_prevVehicle and curVehicle:
                 if g_prevVehicle.name is not curVehicle.name:
-                    onCurrentVehicleChanged(g_prevVehicle, curVehicle)
+                    removeAllRemovableDevicesFromAllVehicle(curVehicle)
+                    equipAllRemovableDevicesOnVehicle(curVehicle)
             g_prevVehicle = curVehicle
 
 
@@ -84,14 +81,13 @@ def new_setVehicleModule(self, newId, slotIdx, oldId, isRemove):
     saveDeviceOnVehicle(vehicle, newId, slotIdx, isRemove)
 
 
-g_started = False
-
 def onAccountShowGUI(ctx):
     global old_setVehicleModule
     global old_recreateVehicle
     global g_xmlSetting
+    global g_prevVehicle
     global g_started
-    msg = __name__ + " 0.9.10 started"
+    msg = __name__ + ' 0.9.10 started'
 
     if g_started:
         return
@@ -104,6 +100,8 @@ def onAccountShowGUI(ctx):
     ClientHangarSpace.recreateVehicle = new_recreateVehicle
     SystemMessages.pushMessage(msg)
     LOG_NOTE(msg)
+    if g_currentVehicle.isInHangar:
+        g_prevVehicle = g_currentVehicle.item
     g_started = True
 
 
