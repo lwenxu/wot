@@ -1,4 +1,4 @@
 
-python -m compileall .
+python -m compileall *.py
 cp *.pyc ./mods
 
