@@ -16,50 +16,35 @@ g_xmlSetting = None
 g_prevVehicle = None
 
 
-def getDeviceInventoryCounts(inventoryDevices, device):
-    invCount = 0
-    try:
-        invCount = inventoryDevices[inventoryDevices.index(device)].count
-    except Exception:
-        pass
-
-    return invCount
-
-
 def equipAllRemovableDevicesOnVehicle(vehicle):
     global g_xmlSetting
-
-    def callback(resultID):
+    try:
+        if g_xmlSetting[vehicle.name]:
+            for slotIdx in range(0, 3):
+                device = vehicle.descriptor.optionalDevices[slotIdx]
+                if not device:
+                    deviceCompactDescr = g_xmlSetting[vehicle.name].readInt('slot' + str(slotIdx + 1), 0)
+                    if deviceCompactDescr is not 0:
+                        BigWorld.player().inventory.equipOptionalDevice(vehicle.invID, deviceCompactDescr, slotIdx, False, None)
+                        LOG_DEBUG('equip', vehicle.name, slotIdx, deviceCompactDescr)
+    except:
+        LOG_CURRENT_EXCEPTION()
         pass
 
-    if g_xmlSetting[vehicle.name]:
-        for slotIdx in range(0, 3):
-            device = vehicle.descriptor.optionalDevices[slotIdx]
-            if not device:
-                deviceCompactDescr = g_xmlSetting[vehicle.name].readInt('slot' + str(slotIdx + 1), 0)
-                if deviceCompactDescr is not 0:
-                    BigWorld.player().inventory.equipOptionalDevice(vehicle.invID, deviceCompactDescr, slotIdx, False, callback)
 
-
-@process
 def removeAllRemovableDevicesFromAllVehicle(curVehicle):
-
-    def callback(resultID):
+    try:
+        vehicles = g_itemsCache.items.getVehicles(REQ_CRITERIA.INVENTORY).values()
+        for vehicle in vehicles:
+            if curVehicle is not vehicle:
+                if vehicle and not (vehicle.isInBattle or vehicle.isLocked):
+                    for slotIdx in range(0, 3):
+                        device = vehicle.descriptor.optionalDevices[slotIdx]
+                        if device and device.removable:
+                            BigWorld.player().inventory.equipOptionalDevice(vehicle.invID, 0, slotIdx, False, None)
+    except:
+        LOG_CURRENT_EXCEPTION()
         pass
-
-    deviceAllInventory = yield Requester('optionalDevice').getFromInventory()
-    alreadyRemoved = []
-    vehicles = g_itemsCache.items.getVehicles(REQ_CRITERIA.INVENTORY).values()
-    for vehicle in vehicles:
-        if curVehicle is not vehicle:
-            if not vehicle.isInBattle:
-                for slotIdx in range(0, 3):
-                    device = vehicle.descriptor.optionalDevices[slotIdx]
-                    if device and device.removable:
-                        devCount = getDeviceInventoryCounts(deviceAllInventory, device)
-                        if devCount is 0 and device.compactDescr not in alreadyRemoved:
-                            BigWorld.player().inventory.equipOptionalDevice(vehicle.invID, 0, slotIdx, False, callback)
-                            alreadyRemoved.append(device.compactDescr)
 
 
 def onCurrentVehicleChanged(prevVehicle, curVehicle):
@@ -67,8 +52,7 @@ def onCurrentVehicleChanged(prevVehicle, curVehicle):
     equipAllRemovableDevicesOnVehicle(curVehicle)
 
 
-def new_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback):
-    old_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback)
+def equipCurrentVehicle():
     global g_prevVehicle
     if g_currentVehicle.isInHangar:
         curVehicle = g_currentVehicle.item
@@ -77,6 +61,11 @@ def new_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback):
                 if g_prevVehicle.name is not curVehicle.name:
                     onCurrentVehicleChanged(g_prevVehicle, curVehicle)
             g_prevVehicle = curVehicle
+
+
+def new_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback):
+    old_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback)
+    equipCurrentVehicle()
 
 
 def saveDeviceOnVehicle(vehicle, deviceId, slotId, isRemove):
@@ -102,7 +91,7 @@ def onAccountShowGUI(ctx):
     global old_recreateVehicle
     global g_xmlSetting
     global g_started
-    sys_msg = __name__ + " 0.9.10 started"
+    msg = __name__ + " 0.9.10 started"
 
     if g_started:
         return
@@ -113,8 +102,8 @@ def onAccountShowGUI(ctx):
     AmmunitionPanel.setVehicleModule = new_setVehicleModule
     old_recreateVehicle = ClientHangarSpace.recreateVehicle
     ClientHangarSpace.recreateVehicle = new_recreateVehicle
-    SystemMessages.pushMessage(sys_msg)
-    LOG_NOTE(sys_msg)
+    SystemMessages.pushMessage(msg)
+    LOG_NOTE(msg)
     g_started = True
 
 
