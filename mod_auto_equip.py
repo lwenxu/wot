@@ -2,6 +2,7 @@ import BigWorld
 import ResMgr
 from CurrentVehicle import g_currentVehicle
 from gui.Scaleform.daapi.view.lobby.hangar.AmmunitionPanel import AmmunitionPanel
+from gui.ClientHangarSpace import ClientHangarSpace
 from gui.shared import g_itemsCache, REQ_CRITERIA
 from gui.shared.utils.requesters.deprecated import Requester
 from adisp import process
@@ -9,7 +10,8 @@ from debug_utils import *
 from gui import SystemMessages
 
 
-g_or_setVehicleModule = None
+old_setVehicleModule = None
+old_recreateVehicle = None
 g_xmlSetting = None
 g_prevVehicle = None
 
@@ -65,7 +67,8 @@ def onCurrentVehicleChanged(prevVehicle, curVehicle):
     equipAllRemovableDevicesOnVehicle(curVehicle)
 
 
-def vehicleCheckCallback():
+def new_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback):
+    old_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback)
     global g_prevVehicle
     if g_currentVehicle.isInHangar:
         curVehicle = g_currentVehicle.item
@@ -74,7 +77,6 @@ def vehicleCheckCallback():
                 if g_prevVehicle.name is not curVehicle.name:
                     onCurrentVehicleChanged(g_prevVehicle, curVehicle)
             g_prevVehicle = curVehicle
-    BigWorld.callback(0.1, vehicleCheckCallback)
 
 
 def saveDeviceOnVehicle(vehicle, deviceId, slotId, isRemove):
@@ -86,9 +88,9 @@ def saveDeviceOnVehicle(vehicle, deviceId, slotId, isRemove):
     g_xmlSetting.save()
 
 
-def hook_setVehicleModule(self, newId, slotIdx, oldId, isRemove):
-    global g_or_setVehicleModule
-    g_or_setVehicleModule(self, newId, slotIdx, oldId, isRemove)
+def new_setVehicleModule(self, newId, slotIdx, oldId, isRemove):
+    global old_setVehicleModule
+    old_setVehicleModule(self, newId, slotIdx, oldId, isRemove)
     vehicle = g_currentVehicle.item
     saveDeviceOnVehicle(vehicle, newId, slotIdx, isRemove)
 
@@ -96,19 +98,21 @@ def hook_setVehicleModule(self, newId, slotIdx, oldId, isRemove):
 g_started = False
 
 def onAccountShowGUI(ctx):
-    global g_or_setVehicleModule
+    global old_setVehicleModule
+    global old_recreateVehicle
     global g_xmlSetting
     global g_started
-    sys_msg = "mod_auto_equip 0.9.10 started"
+    sys_msg = __name__ + " 0.9.10 started"
 
     if g_started:
         return
     g_xmlSetting = ResMgr.openSection('scripts/client/gui/mods/mod_auto_equip.xml', True)
     if not g_xmlSetting:
         g_xmlSetting.save()
-    g_or_setVehicleModule = AmmunitionPanel.setVehicleModule
-    AmmunitionPanel.setVehicleModule = hook_setVehicleModule
-    vehicleCheckCallback()
+    old_setVehicleModule = AmmunitionPanel.setVehicleModule
+    AmmunitionPanel.setVehicleModule = new_setVehicleModule
+    old_recreateVehicle = ClientHangarSpace.recreateVehicle
+    ClientHangarSpace.recreateVehicle = new_recreateVehicle
     SystemMessages.pushMessage(sys_msg)
     LOG_NOTE(sys_msg)
     g_started = True
