@@ -6,12 +6,10 @@ from AvatarInputHandler import AvatarInputHandler
 from Avatar import PlayerAvatar
 import BattleReplay
 from debug_utils import *
-
-
 g_Tundra = True
 g_FullTundra = False
 
-old_onControlModeChanged = AvatarInputHandler.onControlModeChanged
+
 def new_onControlModeChanged(self, eMode, **args):
     global g_Tundra
     global g_FullTundra
@@ -32,7 +30,6 @@ def new_onControlModeChanged(self, eMode, **args):
         BigWorld.wg_enableTreeTransparency(True)
 
 
-old_handleKey = PlayerAvatar.handleKey
 def new_handleKey(self, isDown, key, mods):
     global g_Tundra
     global g_FullTundra
@@ -66,7 +63,6 @@ def new_handleKey(self, isDown, key, mods):
     return old_handleKey(self, isDown, key, mods)
 
 
-old_onEnterWorld = PlayerAvatar.onEnterWorld
 def new_onEnterWorld(self, prereqs):
     global g_Tundra
     global g_FullTundra
@@ -77,8 +73,11 @@ def new_onEnterWorld(self, prereqs):
     BigWorld.wg_enableTreeTransparency(True)
 
 
+old_onControlModeChanged = AvatarInputHandler.onControlModeChanged
 AvatarInputHandler.onControlModeChanged = new_onControlModeChanged
+old_handleKey = PlayerAvatar.handleKey
 PlayerAvatar.handleKey = new_handleKey
+old_onEnterWorld = PlayerAvatar.onEnterWorld
 PlayerAvatar.onEnterWorld = new_onEnterWorld
 
 

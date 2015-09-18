@@ -5,7 +5,6 @@ from gui.battle_control import g_sessionProvider
 from debug_utils import *
 
 
-old_as_setFireInVehicleS = DamagePanel.as_setFireInVehicleS
 def new_as_setFireInVehicleS(self, bool):
     old_as_setFireInVehicleS(self, bool)
     BigWorld.callback(0.01, partial(g_sessionProvider.getEquipmentsCtrl().changeSettingByTag, 'extinguisher', None, BigWorld.player()))
@@ -13,6 +12,7 @@ def new_as_setFireInVehicleS(self, bool):
     return
 
 
+old_as_setFireInVehicleS = DamagePanel.as_setFireInVehicleS
 DamagePanel.as_setFireInVehicleS = new_as_setFireInVehicleS
 
 

@@ -13,33 +13,33 @@ def addEdge(vehicle):
                         BigWorld.wgAddEdgeDetectEntity(vehicle, 0, False)
 
 
-old_startVisual = Vehicle.startVisual;
 def new_startVisual(current):
     old_startVisual(current)
     addEdge(current)
 
 
-old_stopVisual = Vehicle.stopVisual
 def new_stopVisual(current):
     old_stopVisual(current)
     BigWorld.wgDelEdgeDetectEntity(current)
 
 
-old_targetBlur = PlayerAvatar.targetBlur
 def new_targetBlur(current, prevEntity):
     old_targetBlur(current, prevEntity)
     addEdge(prevEntity)
 
 
-old_targetFocus = PlayerAvatar.targetFocus
 def new_targetFocus(current, entity):
     BigWorld.wgDelEdgeDetectEntity(entity)
     old_targetFocus(current, entity)
 
 
+old_startVisual = Vehicle.startVisual
 Vehicle.startVisual = new_startVisual
+old_stopVisual = Vehicle.stopVisual
 Vehicle.stopVisual = new_stopVisual
+old_targetBlur = PlayerAvatar.targetBlur
 PlayerAvatar.targetBlur = new_targetBlur
+old_targetFocus = PlayerAvatar.targetFocus
 PlayerAvatar.targetFocus = new_targetFocus
 
 

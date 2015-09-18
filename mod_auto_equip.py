@@ -4,11 +4,8 @@ from CurrentVehicle import g_currentVehicle
 from gui.Scaleform.daapi.view.lobby.hangar.AmmunitionPanel import AmmunitionPanel
 from gui.ClientHangarSpace import ClientHangarSpace
 from gui.shared import g_itemsCache, REQ_CRITERIA
-from adisp import process
 from debug_utils import *
 from gui import SystemMessages
-old_setVehicleModule = None
-old_recreateVehicle = None
 g_xmlSetting = None
 g_prevVehicle = None
 g_started = False
@@ -79,27 +76,24 @@ def new_setVehicleModule(self, newId, slotIdx, oldId, isRemove):
 
 
 def onAccountShowGUI(ctx):
-    global old_setVehicleModule
-    global old_recreateVehicle
     global g_xmlSetting
     global g_prevVehicle
     global g_started
-    msg = __name__ + ' 0.9.10 started'
 
-    if g_started:
-        return
+    if g_started: return
     g_xmlSetting = ResMgr.openSection('scripts/client/gui/mods/mod_auto_equip.xml', True)
     if not g_xmlSetting:
         g_xmlSetting.save()
-    old_setVehicleModule = AmmunitionPanel.setVehicleModule
-    AmmunitionPanel.setVehicleModule = new_setVehicleModule
-    old_recreateVehicle = ClientHangarSpace.recreateVehicle
-    ClientHangarSpace.recreateVehicle = new_recreateVehicle
-    SystemMessages.pushMessage(msg)
-    LOG_NOTE(msg)
     if g_currentVehicle.isInHangar:
         g_prevVehicle = g_currentVehicle.item
+    SystemMessages.pushMessage(__name__ + ' 0.9.10 started')
     g_started = True
+
+
+old_setVehicleModule = AmmunitionPanel.setVehicleModule
+AmmunitionPanel.setVehicleModule = new_setVehicleModule
+old_recreateVehicle = ClientHangarSpace.recreateVehicle
+ClientHangarSpace.recreateVehicle = new_recreateVehicle
 
 
 init = lambda : None
