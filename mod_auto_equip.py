@@ -7,8 +7,6 @@ from gui.shared import g_itemsCache, REQ_CRITERIA
 from adisp import process
 from debug_utils import *
 from gui import SystemMessages
-
-
 old_setVehicleModule = None
 old_recreateVehicle = None
 g_xmlSetting = None

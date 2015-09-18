@@ -8,27 +8,22 @@ import BattleReplay
 from debug_utils import *
 
 
-PlayerAvatar.enableTundra = True
-PlayerAvatar.enableFullTundra = False
-g_xml = ResMgr.openSection('scripts/client/gui/mods/tundra.xml')
-if g_xml:
-    if g_xml.has_key('key'):
-        PlayerAvatar.Key_Tundra2 = getattr(Keys, g_xml.readString('key'))
-else:
-    PlayerAvatar.Key_Tundra2 = Keys.KEY_F2
-
+g_Tundra = True
+g_FullTundra = False
 
 old_onControlModeChanged = AvatarInputHandler.onControlModeChanged
 def new_onControlModeChanged(self, eMode, **args):
+    global g_Tundra
+    global g_FullTundra
     old_onControlModeChanged(self, eMode, **args)
     if eMode == 'sniper':
-        if PlayerAvatar.enableTundra:
+        if g_Tundra:
             BigWorld.wg_setTreeHidingRadius(750, 0)
             BigWorld.wg_enableTreeTransparency(False)
         else:
             BigWorld.wg_setTreeHidingRadius(12, 15)
             BigWorld.wg_enableTreeTransparency(True)
-    elif PlayerAvatar.enableFullTundra:
+    elif g_FullTundra:
         BigWorld.wg_enableTreeHiding(True)
         BigWorld.wg_setTreeHidingRadius(750, 0)
         BigWorld.wg_enableTreeTransparency(False)
@@ -39,31 +34,33 @@ def new_onControlModeChanged(self, eMode, **args):
 
 old_handleKey = PlayerAvatar.handleKey
 def new_handleKey(self, isDown, key, mods):
-    if key == PlayerAvatar.Key_Tundra2 and mods == 0 and isDown:
+    global g_Tundra
+    global g_FullTundra
+    if key == Keys.KEY_F2 and mods == 0 and isDown:
         if g_appLoader.getDefBattleApp() is not None:
             player = BigWorld.player()
             if player.inputHandler.ctrl == player.inputHandler.ctrls['sniper']:
-                if PlayerAvatar.enableTundra:
+                if g_Tundra:
                     BigWorld.wg_setTreeHidingRadius(12, 15)
                     BigWorld.wg_enableTreeTransparency(True)
                     g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Tundra OFF', 'red'])
-                    PlayerAvatar.enableTundra = False
+                    g_Tundra = False
                 else:
                     BigWorld.wg_setTreeHidingRadius(750, 0)
                     BigWorld.wg_enableTreeTransparency(False)
-                    _appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Tundra  ON', 'gold'])
-                    PlayerAvatar.enableTundra = True
-            elif PlayerAvatar.enableFullTundra:
+                    _appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Tundra ON', 'gold'])
+                    g_Tundra = True
+            elif g_FullTundra:
                 BigWorld.wg_enableTreeHiding(False)
                 BigWorld.wg_enableTreeTransparency(True)
                 g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'TundraFull OFF', 'red'])
-                PlayerAvatar.enableFullTundra = False
+                g_FullTundra = False
             else:
                 BigWorld.wg_enableTreeHiding(True)
                 BigWorld.wg_setTreeHidingRadius(750, 0)
                 BigWorld.wg_enableTreeTransparency(False)
-                g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'TundraFull  ON', 'gold'])
-                PlayerAvatar.enableFullTundra = True
+                g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'TundraFull ON', 'gold'])
+                g_FullTundra = True
             self.soundNotifications.play('chat_shortcut_common_fx')
             return True
     return old_handleKey(self, isDown, key, mods)
@@ -71,9 +68,11 @@ def new_handleKey(self, isDown, key, mods):
 
 old_onEnterWorld = PlayerAvatar.onEnterWorld
 def new_onEnterWorld(self, prereqs):
+    global g_Tundra
+    global g_FullTundra
     old_onEnterWorld(self, prereqs)
-    PlayerAvatar.enableTundra = True
-    PlayerAvatar.enableFullTundra = False
+    g_Tundra = True
+    g_FullTundra = False
     BigWorld.wg_enableTreeHiding(False)
     BigWorld.wg_enableTreeTransparency(True)
 
