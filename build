@@ -1,4 +1,0 @@
-
-python -m compileall mod_*.py
-cp -vf *.pyc ./mods
-
