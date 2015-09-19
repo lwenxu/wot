@@ -45,7 +45,7 @@ def new_handleKey(self, isDown, key, mods):
                 else:
                     BigWorld.wg_setTreeHidingRadius(750, 0)
                     BigWorld.wg_enableTreeTransparency(False)
-                    _appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Tundra ON', 'gold'])
+                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Tundra ON', 'gold'])
                     g_Tundra = True
             elif g_FullTundra:
                 BigWorld.wg_enableTreeHiding(False)
