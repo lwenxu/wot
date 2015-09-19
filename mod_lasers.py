@@ -1,30 +1,33 @@
 import BigWorld
 import Keys
 import ResMgr
+from Avatar import PlayerAvatar
 from PlayerEvents import g_playerEvents
 from gui.app_loader import g_appLoader
-curTime = None
 LaserModActive = True
 entries = {}
 
+def new_handleKey(self, isDown, key, mods):
+    global LaserModActive
+    if key == Keys.KEY_F3 and mods == 0 and isDown:
+        if g_appLoader.getDefBattleApp() is not None:
+            if LaserModActive:
+                g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Lasers OFF', 'red'])
+                LaserModActive = False
+            else:
+                g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Lasers ON', 'gold'])
+                LaserModActive = True
+            self.soundNotifications.play('chat_shortcut_common_fx')
+            return True
+    return old_handleKey(self, isDown, key, mods)
+
+
 def initLasers():
     global entries
-    global curTime
     global LaserModActive
     import Account
     if hasattr(BigWorld.player(), 'isOnArena'):
         if BigWorld.player().isOnArena:
-            if curTime is None or curTime + 1 < BigWorld.time():
-                if BigWorld.isKeyDown(Keys.KEY_F3):
-                    curTime = BigWorld.time()
-                    if LaserModActive:
-                        if g_appLoader.getDefBattleApp() is not None:
-                            g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Lasers OFF', 'red'])
-                            LaserModActive = False
-                    else:
-                        if g_appLoader.getDefBattleApp() is not None:
-                            g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Lasers ON', 'gold'])
-                        LaserModActive = True
             import Vehicle
             if LaserModActive:
                 playerHealth = BigWorld.player().vehicleTypeDescriptor.maxHealth
@@ -44,9 +47,7 @@ def initLasers():
                                     newModel = BigWorld.Model('objects/lasers/%slaser.model' % laserColor)
                                     servo = BigWorld.Servo(listi.modelsDesc['gun']['model'].node('Gun'))
                                     newModel.addMotor(servo)
-                                    entries[v.id] = dict({'model': newModel,
-                                     'vehicle': v,
-                                     'lasttime': BigWorld.time()})
+                                    entries[v.id] = dict({'model': newModel, 'vehicle': v, 'lasttime': BigWorld.time()})
                                     v.addModel(newModel)
                                 else:
                                     entries[v.id]['lasttime'] = BigWorld.time()
@@ -78,6 +79,8 @@ def reloadLasers():
 
 
 g_playerEvents.onAvatarReady += reloadLasers
+old_handleKey = PlayerAvatar.handleKey
+PlayerAvatar.handleKey = new_handleKey
 
 
 init = lambda : None
