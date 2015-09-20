@@ -5,7 +5,7 @@
 sources = $(wildcard mod_*.c)
 targets = $(sources:.py=.pyc)
 
-wotdir = ./wot
+WOTDIR = ./wot
 wotver = 0.9.10
 wotmod = res_mods/$(wotver)
 wotmod_scripts = $(wotmod)/scripts/client/gui/mods
@@ -24,8 +24,8 @@ tags:
 
 install: all
 
-	cp -vf mod_*.pyc $(wotdir)/$(wotmod_scripts)
-	cp -rvf res/* $(wotdir)/$(wotmod)
+	cp -vf mod_*.pyc $(WOTDIR)/$(wotmod_scripts)
+	cp -rvf res/* $(WOTDIR)/$(wotmod)
 
 release: all
 
