@@ -1,0 +1,4 @@
+<mod_lasers.xml>
+    <key> KEY_NUMPAD3 </key>
+    <lasers> false </lasers>
+</mod_lasers.xml>

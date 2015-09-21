@@ -1,4 +1,4 @@
-<Reload>
+<mod_reload.xml>
     <!-- Вкл. мода по умолчанию -->
     <modEnable>True</modEnable>
     <!-- Вкл. отображения перезарядки союзников в начале битвы -->
@@ -30,4 +30,4 @@
     <marker_timeUpdate>0.1</marker_timeUpdate>
     <!-- Корректировка задержки отключения маркера (добавочное время), в сек.-->
     <marker_timeCorrect>1.0</marker_timeCorrect>
-</Reload>
+</mod_reload.xml>

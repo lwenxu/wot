@@ -37,7 +37,7 @@ class MarkerReLoad(object):
 
     def configModule(self):
         self.modEnable = True
-        self.startAlliesEnable = True
+        self.startAlliesEnable = False
         self.bonusBrotherhood = True
         self.bonusStimulator = False
         self.bonusAuto = True
@@ -51,8 +51,8 @@ class MarkerReLoad(object):
         self.alliesEnable = True
         self.SWF_FILE_NAME_ENEMIES = 'marker_red.swf'
         self.SWF_FILE_NAME_ALLIES = 'marker_green.swf'
-        self.marker_timeUpdate = 0.1
-        self.marker_timeCorrect = 1.0
+        self.marker_timeUpdate = 0.5
+        self.marker_timeCorrect = 0.5
         self.configMarker = ResMgr.openSection('scripts/client/gui/mods/mod_reload.xml')
         if self.configMarker != None:
             self.modEnable = self.configMarker.readBool('modEnable')
@@ -69,9 +69,9 @@ class MarkerReLoad(object):
             self.alliesEnable = self.configMarker.readBool('alliesEnable')
             self.SWF_FILE_NAME_ENEMIES = self.configMarker.readString('SWF_FILE_NAME_ENEMIES')
             self.SWF_FILE_NAME_ALLIES = self.configMarker.readString('SWF_FILE_NAME_ALLIES')
-            self.marker_timeUpdate = self.configMarker.readFloat('reload_tout')
-            self.marker_timeCorrect = self.configMarker.readFloat('self.marker_timeCorrect')
-            LOG_NOTE('XML config successfully loaded');
+            self.marker_timeUpdate = self.configMarker.readFloat('marker_timeUpdate')
+            self.marker_timeCorrect = self.configMarker.readFloat('marker_timeCorrect')
+            LOG_NOTE('XML config is loaded');
         return
 
     def moduleMarker(self):

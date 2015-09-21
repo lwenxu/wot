@@ -79,7 +79,6 @@ def onAccountShowGUI(ctx):
     global g_xmlSetting
     global g_prevVehicle
     global g_started
-
     if g_started: return
     g_xmlSetting = ResMgr.openSection('scripts/client/gui/mods/mod_auto_equip.xml', True)
     if not g_xmlSetting:
