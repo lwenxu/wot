@@ -1,6 +1,6 @@
 #!/bin/make -f
 
-.PHONY: all clean install release
+.PHONY: all clean tags install release
 
 sources = $(wildcard mod_*.c)
 targets = $(sources:.py=.pyc)
