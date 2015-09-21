@@ -1,4 +1,4 @@
-<redlaser.visual>
+<laser_green.visual>
 	<node>
 		<identifier>	Scene Root	</identifier>
 		<transform>
@@ -24,7 +24,7 @@
 						<Bool>	true	</Bool>
 					</property>
 					<property>	diffuseMap
-						<Texture>	objects/lasers/redlaser.dds	</Texture>
+						<Texture>	objects/lasers/laser_green.dds	</Texture>
 					</property>
 				</material>
 			</primitiveGroup>
@@ -34,4 +34,4 @@
 		<min>	-0.055000 -0.055004 -0.000000	</min>
 		<max>	0.055000 0.055000 500.000000	</max>
 	</boundingBox>
-</redlaser.visual>
+</laser_green.visual>

@@ -44,7 +44,7 @@ def initLasers():
                                     else:
                                         laserColor = 'yellow'
                                     listi = v.appearance
-                                    newModel = BigWorld.Model('objects/lasers/%slaser.model' % laserColor)
+                                    newModel = BigWorld.Model('objects/lasers/laser_%s.model' % laserColor)
                                     servo = BigWorld.Servo(listi.modelsDesc['gun']['model'].node('Gun'))
                                     newModel.addMotor(servo)
                                     entries[v.id] = dict({'model': newModel, 'vehicle': v, 'lasttime': BigWorld.time()})
