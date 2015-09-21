@@ -20,7 +20,7 @@ SWF_FILE_NAME = 'marker_red.swf'
 class MarkerReLoad(object):
 
     def __init__(self):
-        self.application = __name__
+        self.name = 'MarkerReLoad'
         self.arenaPeriod = False
         self.startTime = 0
         self.arenaGuiTyps = 0
@@ -417,29 +417,29 @@ class MarkerReLoad(object):
             global g_appLoader
             if g_appLoader.getDefBattleApp() is not None:
                 if self.modOFF and key == getattr(Keys, self.toggleKey, None) and isDown:
-                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.application + '  MOD-OFF', 'red'])
+                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + '  MOD-OFF', 'red'])
                     return True
                 if not self.modOFF and key == getattr(Keys, self.modOFFKey, None) and isDown:
-                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.application + '  MOD-OFF', 'red'])
+                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + '  MOD-OFF', 'red'])
                     self.modOFF = True
                     __clearVars()
                     return True
                 if self.modOFF and key == getattr(Keys, self.modOFFKey, None) and isDown:
-                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.application + '  MOD-ON', 'gold'])
+                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + '  MOD-ON', 'gold'])
                     self.modOFF = False
                     vehicles_to_list()
                 if not self.modEnable and key == getattr(Keys, self.toggleKey, None) and isDown:
                     self.modEnable = True
-                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.application + '  ON', 'gold'])
+                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + '  ON', 'gold'])
                     return True
                 if self.modEnable and key == getattr(Keys, self.toggleKey, None) and isDown:
                     if not self.alliesEnable:
                         self.alliesEnable = True
-                        g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.application + ' + allies  ON', 'gold'])
+                        g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + 'Allies  ON', 'gold'])
                         return True
                     self.alliesEnable = False
                     self.modEnable = False
-                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.application + '  OFF', 'red'])
+                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + '  OFF', 'red'])
             return old_PlayerHandleKey(current, isDown, key, mods)
 
         old_PlayerHandleKey = PlayerAvatar.handleKey
@@ -448,9 +448,9 @@ class MarkerReLoad(object):
         def new_LobbyView_populate(current):
             old_LobbyView_populate(current)
             if self.configMarker == None:
-                SystemMessages.pushI18nMessage('<font color="#ff9933"><B>' + self.application + '</B></font><br><br><font color="#cc0000">        Config loading failure!</font>', type=SystemMessages.SM_TYPE.Warning)
+                SystemMessages.pushI18nMessage('<font color="#ff9933"><B>' + self.name + '</B></font><br><br><font color="#cc0000">        Config loading failure!</font>', type=SystemMessages.SM_TYPE.Warning)
             elif self.FlagTXT:
-                SystemMessages.pushI18nMessage('<font color="#ff9933"><B>' + self.application + '</B></font><br><br><font color="#33cc00">     XML config successfully loaded.</font>', type=SystemMessages.SM_TYPE.Warning)
+                SystemMessages.pushI18nMessage('<font color="#ff9933"><B>' + self.name + '</B></font><br><br><font color="#33cc00">     XML config successfully loaded.</font>', type=SystemMessages.SM_TYPE.Warning)
                 self.FlagTXT = False
             return
 
