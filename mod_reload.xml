@@ -1,0 +1,35 @@
+<Reload>
+    <!-- Вкл. мода по умолчанию -->
+    <modEnable>True</modEnable>
+    <!-- Вкл. отображения перезарядки союзников в начале битвы -->
+    <startAlliesEnable>True</startAlliesEnable>
+    <!-- Вкл. отображения перезарядки для противника на миникарте -->
+    <minimapEnable>True</minimapEnable>
+    <!-- Учитывать Боевое Братство -->
+    <bonusBrotherhood>True</bonusBrotherhood>
+    <!-- Учитывать Доп.паёк -->
+    <bonusStimulator>False</bonusStimulator>
+    <!-- Учитывать Боевое Братство и Доп.паёк автоматически при боях на ГК -->
+    <bonusAuto>True</bonusAuto>
+    <!-- Считать барабан перезаряженным, если танк не открывал огонь в течении времени перезарядки -->
+    <timeOutAutoReload>True</timeOutAutoReload>
+    <!-- Добавочное время к timeOutAutoReload, в сек. -->
+    <timeOutReloadDelay>3.0</timeOutReloadDelay>
+    <!-- Горячая клавиша вкл./выкл. режимов -->
+    <toggleKey>KEY_NUMPAD4</toggleKey>
+    <!-- Горячая клавиша вкл./выкл. Полное отключение мода-->
+    <!-- влючая расчёт и слежение за барабанами (при включении барабан считается заряженным полностью) -->
+    <modOFFKey>KEY_NUMPAD6</modOFFKey>
+    <!-- Разрешить показывать перезарядку у техники пропавшей из вида -->
+    <unVisibleReload>True</unVisibleReload>
+    <!-- Вкл. союзников по умолчанию -->
+    <alliesEnable>True</alliesEnable>
+    <!-- Маркер противника-->
+    <SWF_FILE_NAME_ENEMIES>marker_red.swf</SWF_FILE_NAME_ENEMIES>
+    <!-- Маркер союзника-->
+    <SWF_FILE_NAME_ALLIES>marker_green.swf</SWF_FILE_NAME_ALLIES>
+    <!-- Частота проверки маркера в сек. -->
+    <marker_timeUpdate>0.1</marker_timeUpdate>
+    <!-- Корректировка задержки отключения маркера (добавочное время), в сек.-->
+    <marker_timeCorrect>1.0</marker_timeCorrect>
+</Reload>

@@ -9,6 +9,7 @@ WOTDIR = ./wot
 wotver = 0.9.10
 wotmod = res_mods/$(wotver)
 wotmod_scripts = $(wotmod)/scripts/client/gui/mods
+wotmod_configs = $(wotmod)/scripts/client/gui/mods
 
 all: $(targets)
 
@@ -25,6 +26,7 @@ tags:
 install: all
 
 	cp -vf mod_*.pyc $(WOTDIR)/$(wotmod_scripts)
+	cp -vf mod_*.xml $(WOTDIR)/$(wotmod_configs)
 	cp -rvf res/* $(WOTDIR)/$(wotmod)
 
 release: all
