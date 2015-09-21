@@ -3,8 +3,6 @@
     <modEnable>True</modEnable>
     <!-- Вкл. отображения перезарядки союзников в начале битвы -->
     <startAlliesEnable>True</startAlliesEnable>
-    <!-- Вкл. отображения перезарядки для противника на миникарте -->
-    <minimapEnable>True</minimapEnable>
     <!-- Учитывать Боевое Братство -->
     <bonusBrotherhood>True</bonusBrotherhood>
     <!-- Учитывать Доп.паёк -->

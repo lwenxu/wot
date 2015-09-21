@@ -9,7 +9,6 @@ from gui.app_loader import g_appLoader
 from gui.Scaleform.daapi.view.lobby.LobbyView import LobbyView
 from Account import PlayerAccount
 from gui import SystemMessages
-#from gui.Scaleform.Minimap import Minimap
 from gui.Scaleform.Battle import Battle
 import constants
 from constants import ARENA_PERIOD
@@ -39,7 +38,6 @@ class MarkerReLoad(object):
     def configModule(self):
         self.modEnable = True
         self.startAlliesEnable = True
-        self.minimapEnable = False
         self.bonusBrotherhood = True
         self.bonusStimulator = False
         self.bonusAuto = True
@@ -59,7 +57,6 @@ class MarkerReLoad(object):
         if self.configMarker != None:
             self.modEnable = self.configMarker.readBool('modEnable')
             self.startAlliesEnable = self.configMarker.readBool('startAlliesEnable')
-            self.minimapEnable = self.configMarker.readBool('minimapEnable')
             self.bonusBrotherhood = self.configMarker.readBool('bonusBrotherhood')
             self.bonusStimulator = self.configMarker.readBool('bonusStimulator')
             self.bonusAuto = self.configMarker.readBool('bonusAuto')
@@ -84,14 +81,8 @@ class MarkerReLoad(object):
             if self.modOFF:
                 return
             else:
-                #shooter = BigWorld.entity(shooterID)
-                #if shooter is not None and self.minimapEnable:
-                #    __MiniMapAndMarkReload(shooterID)
                 __Reloading__Marker_Action(shooterID)
                 return
-
-        #def __MiniMapAndMarkReload(id, rlFlag = False):
-        #    return
 
         def __Reloading__Marker_Action(id):
             global SWF_FILE_NAME
@@ -181,7 +172,6 @@ class MarkerReLoad(object):
                 else:
                     self.allies_list.update({id: {'ammo': ammo,
                           'time': self.shoot_timer_list[id]}})
-                #__MiniMapAndMarkReload(id, True)
 
         def __calculateReload(id):
             try:
