@@ -26,13 +26,13 @@ tags:
 install: all
 
 	cp -f mod_*.pyc $(WOTDIR)/$(wotmod_scripts)
-	cp -f mod_*.xml $(WOTDIR)/$(wotmod_configs)
 	cp -rf res/* $(WOTDIR)/$(wotmod)
 
 release: all
 
 	mkdir -p $(wotmod_scripts)
 	cp -vf mod_*.pyc $(wotmod_scripts)
+	cp -vf xml/mod_reload.xml $(wotmod_configs)
 	cp -rvf res/* $(wotmod)
 	tar cv res_mods/ | bzip2 -c -9 > wotmods-$(wotver).tar.bz2
 	rm -rf res_mods/ 
