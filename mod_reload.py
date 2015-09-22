@@ -31,47 +31,51 @@ class MarkerReLoad(object):
         self.mod_markers = {}
         self.shoot_timer_list = {}
         self.timeOutReload = {}
-        self.FlagTXT = True
         self.configModule()
         self.moduleMarker()
+        BigWorld.logInfo(self.name, 'mod started', None)
 
     def configModule(self):
+        self.modOFF = False
         self.modEnable = True
+        self.key = Keys.KEY_NUMPAD4
+        self.alliesEnable = False
         self.startAlliesEnable = False
+        self.unVisibleReload = False
         self.bonusBrotherhood = True
         self.bonusStimulator = False
         self.bonusAuto = True
         self.timeOutAutoReload = True
         self.timeOutReloadDelay = 3.0
         self.timeReloadCorrect = 0.0
-        self.toggleKey = 'KEY_NUMPAD4'
-        self.modOFFKey = 'KEY_NUMPAD6'
-        self.modOFF = False
-        self.unVisibleReload = False
-        self.alliesEnable = True
         self.SWF_FILE_NAME_ENEMIES = 'marker_red.swf'
         self.SWF_FILE_NAME_ALLIES = 'marker_green.swf'
         self.marker_timeUpdate = 0.5
         self.marker_timeCorrect = 0.5
         self.configMarker = ResMgr.openSection('scripts/client/gui/mods/mod_reload.xml')
         if self.configMarker != None:
-            self.modEnable = self.configMarker.readBool('modEnable')
-            self.startAlliesEnable = self.configMarker.readBool('startAlliesEnable')
-            self.bonusBrotherhood = self.configMarker.readBool('bonusBrotherhood')
-            self.bonusStimulator = self.configMarker.readBool('bonusStimulator')
-            self.bonusAuto = self.configMarker.readBool('bonusAuto')
-            self.timeOutAutoReload = self.configMarker.readBool('timeOutAutoReload')
-            self.timeOutReloadDelay = self.configMarker.readInt('timeOutReloadDelay')
-            self.timeReloadCorrect = self.configMarker.readInt('timeReloadCorrect')
-            self.toggleKey = self.configMarker.readString('toggleKey')
-            self.modOFFKey = self.configMarker.readString('modOFFKey')
-            self.unVisibleReload = self.configMarker.readBool('unVisibleReload')
-            self.alliesEnable = self.configMarker.readBool('alliesEnable')
-            self.SWF_FILE_NAME_ENEMIES = self.configMarker.readString('SWF_FILE_NAME_ENEMIES')
-            self.SWF_FILE_NAME_ALLIES = self.configMarker.readString('SWF_FILE_NAME_ALLIES')
-            self.marker_timeUpdate = self.configMarker.readFloat('marker_timeUpdate')
-            self.marker_timeCorrect = self.configMarker.readFloat('marker_timeCorrect')
-            LOG_NOTE('XML config is loaded');
+            self.modEnable = self.configMarker.readBool('active')
+            self.key = getattr(Keys, self.configMarker.readString('key', 'KEY_NUMPAD4'))
+            self.alliesEnable = self.configMarker.readBool('allies', False)
+            if not self.alliesEnable:
+                self.startAlliesEnable = False
+            else:
+                self.startAlliesEnable = self.configMarker.readBool('startAllies', False)
+            self.unVisibleReload = self.configMarker.readBool('unvisible', False)
+            self.bonusBrotherhood = self.configMarker.readBool('bonusBrotherhood', True)
+            self.bonusStimulator = self.configMarker.readBool('bonusStimulator', False)
+            self.bonusAuto = self.configMarker.readBool('bonusAuto', True)
+            self.timeOutAutoReload = self.configMarker.readBool('timeOutAutoReload', True)
+            self.timeOutReloadDelay = self.configMarker.readInt('timeOutReloadDelay', 3.0)
+            self.timeReloadCorrect = self.configMarker.readInt('timeReloadCorrect', 0.0)
+            self.SWF_FILE_NAME_ENEMIES = self.configMarker.readString('SWF_FILE_NAME_ENEMIES', 'marker_red.swf')
+            self.SWF_FILE_NAME_ALLIES = self.configMarker.readString('SWF_FILE_NAME_ALLIES', 'marker_green.swf')
+            self.marker_timeUpdate = self.configMarker.readFloat('marker_timeUpdate', 0.5)
+            self.marker_timeCorrect = self.configMarker.readFloat('marker_timeCorrect', 0.5)
+            if not self.modEnable:
+                LOG_WARNING('mod is inactive', None)
+        else:
+            LOG_WARNING('config not found')
         return
 
     def moduleMarker(self):
@@ -124,7 +128,6 @@ class MarkerReLoad(object):
                                     Mod_Marker.destroy_light(flashID)
 
                             marker_check()
-
                 return
 
         def __GetBonus(id):
@@ -144,9 +147,11 @@ class MarkerReLoad(object):
                 bonusVBS = 0
                 if ventil_bonus:
                     bonusVBS += 5
-                if self.bonusBrotherhood or self.bonusAuto and BigWorld.player().arena.guiType == constants.ARENA_GUI_TYPE.COMPANY:
+                arena_type = BigWorld.player().arena.guiType
+                is_prof_arena = (arena_type == constants.ARENA_GUI_TYPE.COMPANY or arena_type == constants.ARENA_GUI_TYPE.CYBERSPORT)
+                if self.bonusBrotherhood or (self.bonusAuto and is_prof_arena):
                     bonusVBS += 5
-                if self.bonusStimulator or self.bonusAuto and BigWorld.player().arena.guiType == constants.ARENA_GUI_TYPE.COMPANY:
+                if self.bonusStimulator or (self.bonusAuto and is_prof_arena):
                     bonusVBS += 10
                 comander_bonus = comander + bonusVBS
                 loader_bonus = comander_bonus * 0.1 + bonusVBS + loader
@@ -167,11 +172,9 @@ class MarkerReLoad(object):
                 reloadTime = veh['vehicleType'].gun['reloadTime']
                 ammo = self.extTanks[id]['ammo']
                 if not __getIsFriendly(id):
-                    self.enemies_list.update({id: {'ammo': ammo,
-                          'time': self.shoot_timer_list[id]}})
+                    self.enemies_list.update({id: {'ammo': ammo, 'time': self.shoot_timer_list[id]}})
                 else:
-                    self.allies_list.update({id: {'ammo': ammo,
-                          'time': self.shoot_timer_list[id]}})
+                    self.allies_list.update({id: {'ammo': ammo, 'time': self.shoot_timer_list[id]}})
 
         def __calculateReload(id):
             try:
@@ -196,8 +199,7 @@ class MarkerReLoad(object):
                         self.enemies_list[id]['time'] = time
                     else:
                         self.allies_list[id]['time'] = time
-                    self.timer_list.update({id: {'time': time,
-                          'shootFlag': True}})
+                    self.timer_list.update({id: {'time': time, 'shootFlag': True}})
                     return bonusReloadTime
                 if self.timeOutAutoReload:
                     self.shoot_timer_list.update({id: time})
@@ -210,26 +212,22 @@ class MarkerReLoad(object):
                         ammo -= 1
                         bonusReloadTime = self.extTanks[id]['clipReloadTime']
                     else:
-                        self.timer_list.update({id: {'time': time,
-                              'shootFlag': True}})
+                        self.timer_list.update({id: {'time': time, 'shootFlag': True}})
                         ammo = self.extTanks[id]['ammo']
                         if id in self.shoot_timer_list:
                             del self.shoot_timer_list[id]
-                    self.enemies_list.update({id: {'ammo': ammo,
-                          'time': time}})
+                    self.enemies_list.update({id: {'ammo': ammo, 'time': time}})
                 if __getIsFriendly(id):
                     ammo = self.allies_list[id]['ammo']
                     if ammo > 1:
                         ammo -= 1
                         bonusReloadTime = self.extTanks[id]['clipReloadTime']
                     else:
-                        self.timer_list.update({id: {'time': time,
-                              'shootFlag': True}})
+                        self.timer_list.update({id: {'time': time, 'shootFlag': True}})
                         ammo = self.extTanks[id]['ammo']
                         if id in self.shoot_timer_list:
                             del self.shoot_timer_list[id]
-                    self.allies_list.update({id: {'ammo': ammo,
-                          'time': time}})
+                    self.allies_list.update({id: {'ammo': ammo, 'time': time}})
                 return bonusReloadTime
             except:
                 return 0
@@ -267,9 +265,7 @@ class MarkerReLoad(object):
             burst = veh['vehicleType'].gun['burst']
             if clip[0] > 1:
                 if id not in self.extTanks:
-                    self.extTanks.update({id: {'reloadTime': reloadTime,
-                          'clipReloadTime': clip[1],
-                          'ammo': clip[0]}})
+                    self.extTanks.update({id: {'reloadTime': reloadTime, 'clipReloadTime': clip[1], 'ammo': clip[0]}})
             time = BigWorld.time()
             battleTime = time - self.startTime
             bonusReloadTime = reloadTime * __GetBonus(id)
@@ -282,8 +278,7 @@ class MarkerReLoad(object):
             if not __getIsFriendly(id):
                 if id not in self.enemies_list:
                     ammo = 1
-                    self.enemies_list.update({id: {'ammo': ammo,
-                          'time': time - bonusReloadTime}})
+                    self.enemies_list.update({id: {'ammo': ammo, 'time': time - bonusReloadTime}})
                 if id in self.extTanks:
                     rlt = bonusReloadTime
                     bonusReloadTime = self.extTanks[id]['clipReloadTime']
@@ -295,8 +290,7 @@ class MarkerReLoad(object):
             if __getIsFriendly(id):
                 if id not in self.allies_list:
                     ammo = 1
-                    self.allies_list.update({id: {'ammo': ammo,
-                          'time': time - bonusReloadTime}})
+                    self.allies_list.update({id: {'ammo': ammo, 'time': time - bonusReloadTime}})
                 if id in self.extTanks:
                     rlt = bonusReloadTime
                     bonusReloadTime = self.extTanks[id]['clipReloadTime']
@@ -344,14 +338,12 @@ class MarkerReLoad(object):
             BigWorld.player().arena.onVehicleKilled += __onVehicleKilled
             self.arenaPeriod = False
             __clearVars()
-            LOG_NOTE('Battle.afterCreate')
             old_startBattle(current)
 
         def new_stopBattle(current):
             BigWorld.player().arena.onVehicleKilled -= __onVehicleKilled
             self.arenaPeriod = False
             __clearVars()
-            LOG_NOTE('Battle.beforeDelete')
             old_stopBattle(current)
 
         old_startBattle = Battle.afterCreate
@@ -367,24 +359,20 @@ class MarkerReLoad(object):
                     reloadTime = veh['vehicleType'].gun['reloadTime']
                     clip = veh['vehicleType'].gun['clip']
                     if clip[0] > 1:
-                        self.extTanks.update({id: {'reloadTime': reloadTime,
-                              'clipReloadTime': clip[1],
-                              'ammo': clip[0]}})
+                        self.extTanks.update({id: {'reloadTime': reloadTime, 'clipReloadTime': clip[1], 'ammo': clip[0]}})
                     if id not in self.visible_list:
                         self.visible_list.append(id)
                     if not __getIsFriendly(id):
                         if id not in self.enemies_list:
                             ammo = 1
-                            self.enemies_list.update({id: {'ammo': ammo,
-                                  'time': 0}})
+                            self.enemies_list.update({id: {'ammo': ammo, 'time': 0}})
                         if id in self.extTanks:
                             ammo = self.extTanks[id]['ammo']
                             self.enemies_list[id]['ammo'] = ammo
                     if __getIsFriendly(id):
                         if id not in self.allies_list:
                             ammo = 1
-                            self.allies_list.update({id: {'ammo': ammo,
-                                  'time': 0}})
+                            self.allies_list.update({id: {'ammo': ammo, 'time': 0}})
                         if id in self.extTanks:
                             ammo = self.extTanks[id]['ammo']
                             self.allies_list[id]['ammo'] = ammo
@@ -405,47 +393,38 @@ class MarkerReLoad(object):
 
         def new_PlayerHandleKey(current, isDown, key, mods):
             global g_appLoader
-            if g_appLoader.getDefBattleApp() is not None:
-                if self.modOFF and key == getattr(Keys, self.toggleKey, None) and isDown:
-                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + '  MOD-OFF', 'red'])
+            if key == self.key and mods == 0 and isDown:
+                if g_appLoader.getDefBattleApp() is not None:
+                    if self.modEnable:
+                        if self.alliesEnable:
+                            self.alliesEnable = False
+                            self.modEnable = False
+                            g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + ' OFF', 'red'])
+                        else:
+                            self.alliesEnable = True
+                            g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + 'Allies  ON', 'gold'])
+                    else:
+                        self.modEnable = True
+                        if self.modOFF:
+                            self.modOFF = False
+                            vehicles_to_list()
+                        g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + ' ON', 'gold'])
+                    current.soundNotifications.play('chat_shortcut_common_fx')
                     return True
-                if not self.modOFF and key == getattr(Keys, self.modOFFKey, None) and isDown:
-                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + '  MOD-OFF', 'red'])
-                    self.modOFF = True
-                    __clearVars()
-                    return True
-                if self.modOFF and key == getattr(Keys, self.modOFFKey, None) and isDown:
-                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + '  MOD-ON', 'gold'])
-                    self.modOFF = False
-                    vehicles_to_list()
-                if not self.modEnable and key == getattr(Keys, self.toggleKey, None) and isDown:
-                    self.modEnable = True
-                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + '  ON', 'gold'])
-                    return True
-                if self.modEnable and key == getattr(Keys, self.toggleKey, None) and isDown:
-                    if not self.alliesEnable:
-                        self.alliesEnable = True
-                        g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + 'Allies  ON', 'gold'])
+            elif key == self.key and mods == 2 and isDown:
+                if g_appLoader.getDefBattleApp() is not None:
+                    if not self.modOFF:
+                        self.modOFF = True
+                        self.modEnable = False
+                        self.alliesEnable = False
+                        __clearVars()
+                        g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + ' DISABLED', 'red'])
+                        current.soundNotifications.play('chat_shortcut_common_fx')
                         return True
-                    self.alliesEnable = False
-                    self.modEnable = False
-                    g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + '  OFF', 'red'])
             return old_PlayerHandleKey(current, isDown, key, mods)
 
         old_PlayerHandleKey = PlayerAvatar.handleKey
         PlayerAvatar.handleKey = new_PlayerHandleKey
-
-        def new_LobbyView_populate(current):
-            old_LobbyView_populate(current)
-            if self.configMarker == None:
-                SystemMessages.pushI18nMessage('<font color="#ff9933"><B>' + self.name + '</B></font><br><br><font color="#cc0000">        Config loading failure!</font>', type=SystemMessages.SM_TYPE.Warning)
-            elif self.FlagTXT:
-                SystemMessages.pushI18nMessage('<font color="#ff9933"><B>' + self.name + '</B></font><br><br><font color="#33cc00">     XML config successfully loaded.</font>', type=SystemMessages.SM_TYPE.Warning)
-                self.FlagTXT = False
-            return
-
-        old_LobbyView_populate = LobbyView._populate
-        LobbyView._populate = new_LobbyView_populate
         pre_vehicle_onEnterWorld = PlayerAvatar.vehicle_onEnterWorld
         PlayerAvatar.vehicle_onEnterWorld = new_vehicle_onEnterWorld
         pre_vehicle_onLeaveWorld = PlayerAvatar.vehicle_onLeaveWorld
@@ -454,7 +433,7 @@ class MarkerReLoad(object):
         PlayerAvatar.showTracer = new_showTracer
 
 
-VM = MarkerReLoad()
+MRL = MarkerReLoad()
 
 
 init = lambda : None
@@ -521,5 +500,4 @@ class _VehicleMarkersManager(Flash):
                 args = []
             self.__ownUI.markerInvoke(handle, (function, args))
         return
-
 

@@ -1,4 +1,4 @@
 <mod_tundra.xml>
+    <active> true </active>
     <key> KEY_NUMPAD2 </key>
-    <tundra> true </tundra>
 </mod_tundra.xml>

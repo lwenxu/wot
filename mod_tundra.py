@@ -12,10 +12,8 @@ g_key = Keys.KEY_NUMPAD2
 g_xmlConfig = ResMgr.openSection('scripts/client/gui/mods/mod_tundra.xml')
 if g_xmlConfig:
     g_key = getattr(Keys, g_xmlConfig.readString('key', 'KEY_NUMPAD2'))
-    g_tundra = g_xmlConfig.readBool('tundra', True)
-    LOG_NOTE('XML config is loaded')
-else:
-    LOG_NOTE('XML config failed to load')
+    g_tundra = g_xmlConfig.readBool('active', True)
+    LOG_NOTE('config is loaded')
 
 def new_onControlModeChanged(self, eMode, **args):
     global g_tundra

@@ -7,15 +7,15 @@ from gui.app_loader import g_appLoader
 from debug_utils import *
 g_active = True
 g_key = Keys.KEY_NUMPAD3
+g_color = True
 g_entries = {}
 
 g_xmlConfig = ResMgr.openSection('scripts/client/gui/mods/mod_lasers.xml')
 if g_xmlConfig:
     g_key = getattr(Keys, g_xmlConfig.readString('key', 'KEY_NUMPAD3'))
-    g_active = g_xmlConfig.readBool('lasers', True)
-    LOG_NOTE('XML config is loaded')
-else:
-    LOG_NOTE('XML config failed to load')
+    g_active = g_xmlConfig.readBool('active', True)
+    g_color = g_xmlConfig.readBool('color', True)
+    LOG_NOTE('config is loaded')
 
 def new_handleKey(self, isDown, key, mods):
     global g_active
@@ -33,6 +33,10 @@ def new_handleKey(self, isDown, key, mods):
     return old_handleKey(self, isDown, key, mods)
 
 
+old_handleKey = PlayerAvatar.handleKey
+PlayerAvatar.handleKey = new_handleKey
+
+
 def initLasers():
     global g_entries
     global g_active
@@ -47,13 +51,16 @@ def initLasers():
                         if v.isAlive():
                             if v.publicInfo['team'] is not BigWorld.player().team:
                                 if not g_entries.has_key(v.id):
-                                    shotsToKill = playerHealth / v.typeDescriptor.gun['shots'][0]['shell']['damage'][0]
-                                    if shotsToKill < 3.0:
-                                        laserColor = 'red'
-                                    elif shotsToKill > 8.0:
-                                        laserColor = 'green'
+                                    if g_color:
+                                        shotsToKill = playerHealth / v.typeDescriptor.gun['shots'][0]['shell']['damage'][0]
+                                        if shotsToKill < 3.0:
+                                            laserColor = 'red'
+                                        elif shotsToKill > 8.0:
+                                            laserColor = 'green'
+                                        else:
+                                            laserColor = 'yellow'
                                     else:
-                                        laserColor = 'yellow'
+                                        laserColor = 'red'
                                     listi = v.appearance
                                     newModel = BigWorld.Model('objects/lasers/laser_%s.model' % laserColor)
                                     servo = BigWorld.Servo(listi.modelsDesc['gun']['model'].node('Gun'))
@@ -90,8 +97,6 @@ def reloadLasers():
 
 
 g_playerEvents.onAvatarReady += reloadLasers
-old_handleKey = PlayerAvatar.handleKey
-PlayerAvatar.handleKey = new_handleKey
 
 
 init = lambda : None

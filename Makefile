@@ -25,9 +25,9 @@ tags:
 
 install: all
 
-	cp -vf mod_*.pyc $(WOTDIR)/$(wotmod_scripts)
-	cp -vf mod_*.xml $(WOTDIR)/$(wotmod_configs)
-	cp -rvf res/* $(WOTDIR)/$(wotmod)
+	cp -f mod_*.pyc $(WOTDIR)/$(wotmod_scripts)
+	cp -f mod_*.xml $(WOTDIR)/$(wotmod_configs)
+	cp -rf res/* $(WOTDIR)/$(wotmod)
 
 release: all
 
