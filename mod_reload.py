@@ -36,12 +36,12 @@ class MarkerReLoad(object):
         BigWorld.logInfo(self.name, 'mod started', None)
 
     def configModule(self):
-        self.modOFF = False
-        self.modEnable = True
+        self.disabled = False
+        self.active = True
         self.key = Keys.KEY_NUMPAD4
-        self.alliesEnable = False
-        self.startAlliesEnable = False
-        self.unVisibleReload = False
+        self.allies = False
+        self.alliesAtStart = False
+        self.unvisible = False
         self.bonusBrotherhood = True
         self.bonusStimulator = False
         self.bonusAuto = True
@@ -50,18 +50,15 @@ class MarkerReLoad(object):
         self.timeReloadCorrect = 0.0
         self.SWF_FILE_NAME_ENEMIES = 'marker_red.swf'
         self.SWF_FILE_NAME_ALLIES = 'marker_green.swf'
-        self.marker_timeUpdate = 0.5
-        self.marker_timeCorrect = 0.5
+        self.marker_timeUpdate = 0.3
+        self.marker_timeCorrect = 0.3
         self.configMarker = ResMgr.openSection('scripts/client/gui/mods/mod_reload.xml')
         if self.configMarker != None:
-            self.modEnable = self.configMarker.readBool('active')
+            self.active = self.configMarker.readBool('active')
             self.key = getattr(Keys, self.configMarker.readString('key', 'KEY_NUMPAD4'))
-            self.alliesEnable = self.configMarker.readBool('allies', False)
-            if not self.alliesEnable:
-                self.startAlliesEnable = False
-            else:
-                self.startAlliesEnable = self.configMarker.readBool('startAllies', False)
-            self.unVisibleReload = self.configMarker.readBool('unvisible', False)
+            self.allies = self.configMarker.readBool('allies', False)
+            self.alliesAtStart = self.configMarker.readBool('alliesAtStart', self.allies)
+            self.unvisible = self.configMarker.readBool('unvisible', False)
             self.bonusBrotherhood = self.configMarker.readBool('bonusBrotherhood', True)
             self.bonusStimulator = self.configMarker.readBool('bonusStimulator', False)
             self.bonusAuto = self.configMarker.readBool('bonusAuto', True)
@@ -70,9 +67,9 @@ class MarkerReLoad(object):
             self.timeReloadCorrect = self.configMarker.readInt('timeReloadCorrect', 0.0)
             self.SWF_FILE_NAME_ENEMIES = self.configMarker.readString('SWF_FILE_NAME_ENEMIES', 'marker_red.swf')
             self.SWF_FILE_NAME_ALLIES = self.configMarker.readString('SWF_FILE_NAME_ALLIES', 'marker_green.swf')
-            self.marker_timeUpdate = self.configMarker.readFloat('marker_timeUpdate', 0.5)
-            self.marker_timeCorrect = self.configMarker.readFloat('marker_timeCorrect', 0.5)
-            if not self.modEnable:
+            self.marker_timeUpdate = self.configMarker.readFloat('marker_timeUpdate', 0.3)
+            self.marker_timeCorrect = self.configMarker.readFloat('marker_timeCorrect', 0.3)
+            if not self.active:
                 LOG_WARNING('mod is inactive', None)
         else:
             LOG_WARNING('config not found')
@@ -82,7 +79,7 @@ class MarkerReLoad(object):
 
         def new_showTracer(current, shooterID, shotID, isRicochet, effectsIndex, refStartPoint, velocity, gravity, maxShotDist):
             pre_showTracer(current, shooterID, shotID, isRicochet, effectsIndex, refStartPoint, velocity, gravity, maxShotDist)
-            if self.modOFF:
+            if self.disabled:
                 return
             else:
                 __Reloading__Marker_Action(shooterID)
@@ -90,12 +87,12 @@ class MarkerReLoad(object):
 
         def __Reloading__Marker_Action(id):
             global SWF_FILE_NAME
-            if self.modOFF:
+            if self.disabled:
                 return
             else:
                 if __Remaining(id):
                     reload_time = __calculateReload(id)
-                    if reload_time > 1.0 and self.modEnable:
+                    if reload_time > 1.0 and self.active:
                         flashID = str(''.join([str(id), 'vehicleMarkersManager']))
                         if not __getIsFriendly(id):
                             SWF_FILE_NAME = self.SWF_FILE_NAME_ENEMIES
@@ -116,11 +113,11 @@ class MarkerReLoad(object):
                             def marker_check():
                                 try:
                                     stop_mark = True
-                                    if __Remaining(id) and self.modEnable and not (__getIsFriendly(id) and not self.alliesEnable):
+                                    if __Remaining(id) and self.active and not (__getIsFriendly(id) and not self.allies):
                                         if BigWorld.time() < enout:
                                             if self.mod_markers[flashID] == Mod_Marker:
                                                 stop_mark = False
-                                    if stop_mark or self.modOFF or not self.unVisibleReload and id not in self.visible_list:
+                                    if stop_mark or self.disabled or not self.unvisible and id not in self.visible_list:
                                         Mod_Marker.destroy_light(flashID)
                                     else:
                                         BigWorld.callback(self.marker_timeUpdate, marker_check)
@@ -249,7 +246,7 @@ class MarkerReLoad(object):
 
         def new_vehicle_onEnterWorld(current, vehicle):
             pre_vehicle_onEnterWorld(current, vehicle)
-            if self.modOFF:
+            if self.disabled:
                 return
             if not self.arenaPeriod:
                 return
@@ -309,7 +306,7 @@ class MarkerReLoad(object):
                 self.visible_list.remove(id)
 
         def __onVehicleKilled(targetID, atackerID, *args):
-            if self.modOFF:
+            if self.disabled:
                 return
             id = targetID
             if id in self.visible_list:
@@ -384,7 +381,7 @@ class MarkerReLoad(object):
             if period == ARENA_PERIOD.BATTLE:
                 self.arenaPeriod = True
                 self.startTime = BigWorld.time()
-                if self.startAlliesEnable:
+                if self.alliesAtStart:
                     for id in self.allies_list:
                         __Reloading__Marker_Action(id)
 
@@ -395,28 +392,28 @@ class MarkerReLoad(object):
             global g_appLoader
             if key == self.key and mods == 0 and isDown:
                 if g_appLoader.getDefBattleApp() is not None:
-                    if self.modEnable:
-                        if self.alliesEnable:
-                            self.alliesEnable = False
-                            self.modEnable = False
+                    if self.active:
+                        if self.allies:
+                            self.allies = False
+                            self.active = False
                             g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + ' OFF', 'red'])
                         else:
-                            self.alliesEnable = True
+                            self.allies = True
                             g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + 'Allies  ON', 'gold'])
                     else:
-                        self.modEnable = True
-                        if self.modOFF:
-                            self.modOFF = False
+                        self.active = True
+                        if self.disabled:
+                            self.disabled = False
                             vehicles_to_list()
                         g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + ' ON', 'gold'])
                     current.soundNotifications.play('chat_shortcut_common_fx')
                     return True
             elif key == self.key and mods == 2 and isDown:
                 if g_appLoader.getDefBattleApp() is not None:
-                    if not self.modOFF:
-                        self.modOFF = True
-                        self.modEnable = False
-                        self.alliesEnable = False
+                    if not self.disabled:
+                        self.disabled = True
+                        self.active = False
+                        self.allies = False
                         __clearVars()
                         g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + ' DISABLED', 'red'])
                         current.soundNotifications.play('chat_shortcut_common_fx')
