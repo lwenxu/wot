@@ -22,12 +22,12 @@
     <timeOutReloadDelay> 3.0 </timeOutReloadDelay>
 
     <!-- маркер противника -->
-    <SWF_FILE_NAME_ENEMIES> marker_red.swf </SWF_FILE_NAME_ENEMIES>
+    <enemiesMarker> marker_red.swf </SWF_FILE_NAME_ENEMIES>
     <!-- маркер союзника -->
-    <SWF_FILE_NAME_ALLIES> marker_green.swf </SWF_FILE_NAME_ALLIES>
+    <alliesMarker> marker_green.swf </SWF_FILE_NAME_ALLIES>
 
     <!-- частота проверки маркера в сек. -->
-    <marker_timeUpdate>0.3</marker_timeUpdate>
+    <marker_timeUpdate>0.5</marker_timeUpdate>
     <!-- корректировка задержки отключения маркера (добавочное время), в сек. -->
-    <marker_timeCorrect>0.3</marker_timeCorrect>
+    <marker_timeCorrect>0.5</marker_timeCorrect>
 </mod_reload.xml>

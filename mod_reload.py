@@ -50,25 +50,25 @@ class MarkerReLoad(object):
         self.timeReloadCorrect = 0.0
         self.SWF_FILE_NAME_ENEMIES = 'marker_red.swf'
         self.SWF_FILE_NAME_ALLIES = 'marker_green.swf'
-        self.marker_timeUpdate = 0.3
-        self.marker_timeCorrect = 0.3
-        self.configMarker = ResMgr.openSection('scripts/client/gui/mods/mod_reload.xml')
-        if self.configMarker != None:
-            self.active = self.configMarker.readBool('active')
-            self.key = getattr(Keys, self.configMarker.readString('key', 'KEY_NUMPAD4'))
-            self.allies = self.configMarker.readBool('allies', False)
-            self.alliesAtStart = self.configMarker.readBool('alliesAtStart', self.allies)
-            self.unvisible = self.configMarker.readBool('unvisible', False)
-            self.bonusBrotherhood = self.configMarker.readBool('bonusBrotherhood', True)
-            self.bonusStimulator = self.configMarker.readBool('bonusStimulator', False)
-            self.bonusAuto = self.configMarker.readBool('bonusAuto', True)
-            self.timeOutAutoReload = self.configMarker.readBool('timeOutAutoReload', True)
-            self.timeOutReloadDelay = self.configMarker.readInt('timeOutReloadDelay', 3.0)
-            self.timeReloadCorrect = self.configMarker.readInt('timeReloadCorrect', 0.0)
-            self.SWF_FILE_NAME_ENEMIES = self.configMarker.readString('SWF_FILE_NAME_ENEMIES', 'marker_red.swf')
-            self.SWF_FILE_NAME_ALLIES = self.configMarker.readString('SWF_FILE_NAME_ALLIES', 'marker_green.swf')
-            self.marker_timeUpdate = self.configMarker.readFloat('marker_timeUpdate', 0.3)
-            self.marker_timeCorrect = self.configMarker.readFloat('marker_timeCorrect', 0.3)
+        self.marker_timeUpdate = 0.5
+        self.marker_timeCorrect = 0.5
+        self.config = ResMgr.openSection('scripts/client/gui/mods/mod_reload.xml')
+        if self.config:
+            self.active = self.config.readBool('active', True)
+            self.key = getattr(Keys, self.config.readString('key', 'KEY_NUMPAD4'))
+            self.allies = self.config.readBool('allies', False)
+            self.alliesAtStart = self.config.readBool('alliesAtStart', False)
+            self.unvisible = self.config.readBool('unvisible', False)
+            self.bonusBrotherhood = self.config.readBool('bonusBrotherhood', True)
+            self.bonusStimulator = self.config.readBool('bonusStimulator', False)
+            self.bonusAuto = self.config.readBool('bonusAuto', True)
+            self.timeOutAutoReload = self.config.readBool('timeOutAutoReload', True)
+            self.timeOutReloadDelay = self.config.readInt('timeOutReloadDelay', 3.0)
+            self.timeReloadCorrect = self.config.readInt('timeReloadCorrect', 0.0)
+            self.SWF_FILE_NAME_ENEMIES = self.config.readString('enemiesMarker', 'marker_red.swf')
+            self.SWF_FILE_NAME_ALLIES = self.config.readString('alliesMarker', 'marker_green.swf')
+            self.marker_timeUpdate = self.config.readFloat('marker_timeUpdate', 0.3)
+            self.marker_timeCorrect = self.config.readFloat('marker_timeCorrect', 0.3)
             if not self.active:
                 LOG_WARNING('mod is inactive', None)
         else:
