@@ -1,6 +1,8 @@
 import BigWorld
 import Keys
 import ResMgr
+import Account
+import Vehicle
 from Avatar import PlayerAvatar
 from PlayerEvents import g_playerEvents
 from gui.app_loader import g_appLoader
@@ -41,10 +43,8 @@ PlayerAvatar.handleKey = new_handleKey
 def initLasers():
     global g_entries
     global g_active
-    import Account
     if hasattr(BigWorld.player(), 'isOnArena'):
         if BigWorld.player().isOnArena:
-            import Vehicle
             if g_active:
                 playerHealth = BigWorld.player().vehicleTypeDescriptor.maxHealth
                 for v in BigWorld.entities.values():
