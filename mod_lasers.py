@@ -17,6 +17,7 @@ if g_xmlConfig:
     g_color = g_xmlConfig.readBool('color', True)
     LOG_NOTE('config is loaded')
 
+
 def new_handleKey(self, isDown, key, mods):
     global g_active
     global g_key
@@ -69,7 +70,6 @@ def initLasers():
                                     v.addModel(newModel)
                                 else:
                                     g_entries[v.id]['lasttime'] = BigWorld.time()
-
             currentTime = BigWorld.time()
             for k in g_entries.keys():
                 if g_entries[k]['lasttime'] + 0.5 < currentTime or not g_active:
@@ -78,12 +78,9 @@ def initLasers():
                         ModelToDel['vehicle'].delModel(ModelToDel['model'])
                     except:
                         pass
-
                     del g_entries[k]
-
     if type(BigWorld.player()) is not Account.PlayerAccount:
         BigWorld.callback(0.2, lambda : initLasers())
-    return
 
 
 def reloadLasers():
