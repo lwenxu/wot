@@ -11,6 +11,7 @@ g_prevVehicleID = None
 g_started = False
 g_vAppearance = None
 
+
 def equipOptionalDevicesOnVehicle(vehicle):
     global g_xmlSetting
     try:

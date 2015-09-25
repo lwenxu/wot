@@ -433,14 +433,6 @@ class MarkerReLoad(object):
 MRL = MarkerReLoad()
 
 
-init = lambda : None
-fini = lambda : None
-onAccountBecomePlayer = lambda : None
-onAccountBecomeNonPlayer = lambda : None
-onAvatarBecomePlayer = lambda : None
-onAccountShowGUI = lambda ctx : None
-
-
 import weakref
 import GUI
 from gui.Scaleform.Flash import Flash

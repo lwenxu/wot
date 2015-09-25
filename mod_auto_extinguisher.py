@@ -15,11 +15,3 @@ def new_as_setFireInVehicleS(self, bool):
 old_as_setFireInVehicleS = DamagePanel.as_setFireInVehicleS
 DamagePanel.as_setFireInVehicleS = new_as_setFireInVehicleS
 
-
-init = lambda : None
-fini = lambda : None
-onAccountBecomePlayer = lambda : None
-onAccountBecomeNonPlayer = lambda : None
-onAvatarBecomePlayer = lambda : None
-onAccountShowGUI = lambda ctx : None
-

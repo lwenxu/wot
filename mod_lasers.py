@@ -95,11 +95,3 @@ def reloadLasers():
 
 g_playerEvents.onAvatarReady += reloadLasers
 
-
-init = lambda : None
-fini = lambda : None
-onAccountBecomePlayer = lambda : None
-onAccountBecomeNonPlayer = lambda : None
-onAvatarBecomePlayer = lambda : None
-onAccountShowGUI = lambda ctx : None
-

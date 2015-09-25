@@ -42,11 +42,3 @@ PlayerAvatar.targetBlur = new_targetBlur
 old_targetFocus = PlayerAvatar.targetFocus
 PlayerAvatar.targetFocus = new_targetFocus
 
-
-init = lambda : None
-fini = lambda : None
-onAccountBecomePlayer = lambda : None
-onAccountBecomeNonPlayer = lambda : None
-onAvatarBecomePlayer = lambda : None
-onAccountShowGUI = lambda ctx : None
-

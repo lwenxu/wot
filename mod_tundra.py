@@ -84,11 +84,3 @@ PlayerAvatar.handleKey = new_handleKey
 old_onEnterWorld = PlayerAvatar.onEnterWorld
 PlayerAvatar.onEnterWorld = new_onEnterWorld
 
-
-init = lambda : None
-fini = lambda : None
-onAccountBecomePlayer = lambda : None
-onAccountBecomeNonPlayer = lambda : None
-onAvatarBecomePlayer = lambda : None
-onAccountShowGUI = lambda ctx : None
-

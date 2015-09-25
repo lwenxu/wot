@@ -34,11 +34,3 @@ DamagePanel.as_updateDeviceStateS = new_as_updateDeviceStateS
 old_handleKey = PlayerAvatar.handleKey
 PlayerAvatar.handleKey = new_handleKey
 
-
-init = lambda : None
-fini = lambda : None
-onAccountBecomePlayer = lambda : None
-onAccountBecomeNonPlayer = lambda : None
-onAvatarBecomePlayer = lambda : None
-onAccountShowGUI = lambda ctx : None
-
