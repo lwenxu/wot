@@ -22,9 +22,9 @@
     <timeOutReloadDelay> 3.0 </timeOutReloadDelay>
 
     <!-- маркер противника -->
-    <enemiesMarker> marker_red.swf </SWF_FILE_NAME_ENEMIES>
+    <enemiesMarker> marker_red.swf </enemiesMarker>
     <!-- маркер союзника -->
-    <alliesMarker> marker_green.swf </SWF_FILE_NAME_ALLIES>
+    <alliesMarker> marker_green.swf </alliesMarker>
 
     <!-- частота проверки маркера в сек. -->
     <marker_timeUpdate>0.5</marker_timeUpdate>

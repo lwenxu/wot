@@ -67,8 +67,8 @@ class MarkerReLoad(object):
             self.timeReloadCorrect = self.config.readInt('timeReloadCorrect', 0.0)
             self.SWF_FILE_NAME_ENEMIES = self.config.readString('enemiesMarker', 'marker_red.swf')
             self.SWF_FILE_NAME_ALLIES = self.config.readString('alliesMarker', 'marker_green.swf')
-            self.marker_timeUpdate = self.config.readFloat('marker_timeUpdate', 0.3)
-            self.marker_timeCorrect = self.config.readFloat('marker_timeCorrect', 0.3)
+            self.marker_timeUpdate = self.config.readFloat('marker_timeUpdate', 0.5)
+            self.marker_timeCorrect = self.config.readFloat('marker_timeCorrect', 0.5)
             if not self.active:
                 LOG_WARNING('mod is inactive', None)
         else:
