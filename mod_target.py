@@ -1,4 +1,4 @@
-import BigWorld, ResMgr, Math, Keys
+import BigWorld, ResMgr, Keys
 from Avatar import PlayerAvatar
 from Account import PlayerAccount
 from gui import SystemMessages
@@ -7,6 +7,7 @@ from gui.Scaleform.Minimap import Minimap
 from gui.Scaleform.Battle import Battle
 from tutorial.gui.Scaleform.battle.legacy import ScaleformLayout
 from tutorial.gui.Scaleform.battle.layout import BattleLayout
+from debug_utils import *
 
 
 class DirectionBox(object):
@@ -16,52 +17,41 @@ class DirectionBox(object):
         self.directionModule()
 
     def directionConfig(self):
-        self.directionRecord = {}
-        self.directionDerive = {}
-        self.directionConfig = ResMgr.openSection('scripts/client/mods/ModificationDirection.xml')
+        self.directionConfig = ResMgr.openSection('scripts/client/gui/mods/mod_target.xml')
         if self.directionConfig:
-            self.directionRecord['directionEnable'] = self.directionConfig.readInt('directionEnable', 1)
-            self.directionRecord['directionMethod'] = self.directionConfig.readInt('directionMethod', 1)
-            self.directionRecord['directionSquare'] = self.directionConfig.readInt('directionSquare', 500)
-            self.directionRecord['directionNumber'] = self.directionConfig.readInt('directionNumber', 1)
-            self.directionRecord['directionLength'] = self.directionConfig.readInt('directionLength', 1)
-            self.directionRecord['directionPushed'] = getattr(Keys, self.directionConfig.readString('directionPushed', 'KEY_0'), None)
-            self.directionRecord['directionReload'] = getattr(Keys, self.directionConfig.readString('directionReload', 'KEY_1'), None)
-            self.directionRecord['directionButton'] = getattr(Keys, self.directionConfig.readString('directionButton', 'KEY_2'), None)
+            self.directionActive = self.directionConfig.readBool('active', True)
+            self.directionSquare = self.directionConfig.readInt('square', 500)
+            LOG_NOTE('config is loaded')
 
     def directionOption(self):
-        self.directionRecord = {'directionEnable': 1,
-         'directionMethod': 1,
-         'directionSquare': 620,
-         'directionNumber': 1,
-         'directionLength': 1}
+        self.directionActive = True
+        self.directionSquare = 620
 
     def directionModule(self):
-        pre_notifyEnterWorld = PlayerAvatar.onEnterWorld
 
         def new_notifyEnterWorld(current, prereqs):
             pre_notifyEnterWorld(current, prereqs)
             self.directionValues(current)
             self.directionParams(current)
 
+        pre_notifyEnterWorld = PlayerAvatar.onEnterWorld
         PlayerAvatar.onEnterWorld = new_notifyEnterWorld
-        pre_notifyLeaveWorld = PlayerAvatar.onLeaveWorld
 
         def new_notifyLeaveWorld(current):
             pre_notifyLeaveWorld(current)
             if self.vehicleIndicate:
                 self.directionRemove(self.currentIndicate)
 
+        pre_notifyLeaveWorld = PlayerAvatar.onLeaveWorld
         PlayerAvatar.onLeaveWorld = new_notifyLeaveWorld
-        pre_notifyVehicleStart = Minimap.notifyVehicleStart
 
         def new_notifyVehicleStart(current, vInfo, guiProps):
             pre_notifyVehicleStart(current, vInfo, guiProps)
             vehicleID = vInfo.vehicleID
             if self.arenaPlayer.team is not self.arenaArenas.vehicles[vehicleID]['team'] and self.arenaArenas.vehicles[self.arenaPlayer.playerVehicleID]['isAlive']:
-                if self.vehicleDistance(vehicleID) > self.directionRecord['directionSquare']:
+                if self.vehicleDistance(vehicleID) > self.directionSquare:
                     self.directionBounce(vehicleID)
-                if self.vehicleDistance(vehicleID) < self.directionRecord['directionSquare']:
+                if self.vehicleDistance(vehicleID) < self.directionSquare:
                     if len(self.vehicleIndicate) == 0:
                         self.directionAppend(vehicleID)
                     if len(self.vehicleIndicate) == 1:
@@ -70,8 +60,8 @@ class DirectionBox(object):
                         if self.vehicleDistance(vehicleID) > self.currentDistance:
                             self.directionBounce(vehicleID)
 
+        pre_notifyVehicleStart = Minimap.notifyVehicleStart
         Minimap.notifyVehicleStart = new_notifyVehicleStart
-        pre_notifyVehicleStop = Minimap.notifyVehicleStop
 
         def new_notifyVehicleStop(current, vehicleID):
             pre_notifyVehicleStop(current, vehicleID)
@@ -83,6 +73,7 @@ class DirectionBox(object):
                     self.directionDelete(vehicleID)
                     self.directionRefine(vehicleID)
 
+        pre_notifyVehicleStop = Minimap.notifyVehicleStop
         Minimap.notifyVehicleStop = new_notifyVehicleStop
 
         def __onVehicleKilled(targetID, atackerID, *args):
@@ -98,12 +89,13 @@ class DirectionBox(object):
             BigWorld.player().arena.onVehicleKilled += __onVehicleKilled
             old_startBattle(current)
 
+        old_startBattle = Battle.afterCreate
+        Battle.afterCreate = new_startBattle
+
         def new_stopBattle(current):
             BigWorld.player().arena.onVehicleKilled -= __onVehicleKilled
             old_stopBattle(current)
 
-        old_startBattle = Battle.afterCreate
-        Battle.afterCreate = new_startBattle
         old_stopBattle = Battle.beforeDelete
         Battle.beforeDelete = new_stopBattle
 
@@ -125,7 +117,6 @@ class DirectionBox(object):
         self.callbackWilling = None
         self.callbackProcess = None
         self.indicatorShaped = None
-        return
 
     def directionValues(self, callback):
         self.arenaPlayer = BigWorld.player()
@@ -145,8 +136,6 @@ class DirectionBox(object):
             return 1
         elif BigWorld.wg_collideSegment(self.arenaSpaces, self.directionMatrix(self.directionEntity(callback)), self.directionMatrix(self.directionEntity(self.arenaPlayer.playerVehicleID)), False) != None:
             return 0
-        #else:
-        #    return
 
     def directionMethod(self, callback):
         if len(self.vehicleIndicate) == 0:
@@ -209,16 +198,15 @@ class DirectionBox(object):
                 self.indicatorShaped = self.directionShaped = 'green'
             if self.indicatorShaped:
                 self.indicatorID.setShape(self.indicatorShaped)
-        return
 
     def directionUpdate(self, callback):
-        if self.vehicleDistance(callback) < self.directionRecord['directionSquare']:
+        if self.vehicleDistance(callback) < self.directionSquare:
             self.currentDistance = self.vehicleDistance(callback)
             self.distantPosition = self.directionEntity(callback).position
             self.directionShapes(callback)
             self.directionSearch(self.distantPosition)
             self.currentIndicate.setDistance(self.currentDistance)
-        if self.vehicleDistance(callback) > self.directionRecord['directionSquare']:
+        if self.vehicleDistance(callback) > self.directionSquare:
             self.directionRemove(self.currentIndicate)
             self.directionDelete(callback)
             self.directionRefine(callback)
@@ -249,7 +237,6 @@ class DirectionBox(object):
         self.currentPosition = None
         self.currentIndicate = None
         self.indicatorShaped = None
-        return
 
     def vehicleDistance(self, callback):
         return (self.arenaPlayer.position - self.directionEntity(callback).position).length
@@ -257,12 +244,10 @@ class DirectionBox(object):
     def directionSystem(self, callback):
         if self.callbackProcess is None:
             self.directionRepeat(callback)
-        return
 
     def directionVerife(self, callback):
         if len(self.vehicleBouncing) == 0:
             self.callbackProcess = None
-        return
 
     def directionRepeat(self, callback):
         if not self.arenaArenas.vehicles[self.arenaPlayer.playerVehicleID]['isAlive']:
@@ -277,9 +262,9 @@ class DirectionBox(object):
                 self.directionUpdate(vehicleID)
             if vehicleID != self.currentCarriage:
                 if len(self.vehicleIndicate) == 0:
-                    if self.vehicleDistance(vehicleID) < self.directionRecord['directionSquare']:
+                    if self.vehicleDistance(vehicleID) < self.directionSquare:
                         self.directionAppend(vehicleID)
-                    if self.vehicleDistance(vehicleID) > self.directionRecord['directionSquare']:
+                    if self.vehicleDistance(vehicleID) > self.directionSquare:
                         pass
                 if len(self.vehicleIndicate) == 1:
                     if self.vehicleDistance(vehicleID) < self.currentDistance:
