@@ -26,7 +26,6 @@ if g_xmlConfig:
     g_disappearCaption = g_xmlConfig.readBool('caption', True)
     LOG_NOTE('config is loaded')
 
-
 def new_handleKey(self, isDown, key, mods):
     global g_disappearDelayEnabled
     global g_key
@@ -42,10 +41,8 @@ def new_handleKey(self, isDown, key, mods):
             return True
     return old_handleKey(self, isDown, key, mods)
 
-
 old_handleKey = PlayerAvatar.handleKey
 PlayerAvatar.handleKey = new_handleKey
-
 
 def new_addStippleModel(self, vehID):
     global g_times
@@ -84,7 +81,6 @@ def new_addStippleModel(self, vehID):
         CallAddStippleMode = BigWorld.callback(_VEHICLE_DISAPPEAR_TIME, partial(self._StippleManager__removeStippleModel, vehID))
     self._StippleManager__stippleDescs[vehID] = (stippleModel, CallAddStippleMode)
 
-
 def delBoundingBox():
     global g_times
     global g_disappearDelay
@@ -92,7 +88,6 @@ def delBoundingBox():
         if BigWorld.time() - value['time'] >= g_disappearDelay:
             GUI.delRoot(value['bb'])
             g_times.remove(value)
-
 
 VehicleAppearance = StippleManager._StippleManager__addStippleModel
 if g_disappearDelayEnabled:

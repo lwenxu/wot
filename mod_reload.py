@@ -429,7 +429,6 @@ class MarkerReLoad(object):
         pre_showTracer = PlayerAvatar.showTracer
         PlayerAvatar.showTracer = new_showTracer
 
-
 MRL = MarkerReLoad()
 
 

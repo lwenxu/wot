@@ -13,7 +13,6 @@ g_vAppearance = None
 g_autoEquip = True
 g_returnCrew = True
 
-
 def equipOptionalDevices(curVehicle):
     if g_xmlSetting[curVehicle.name]:
         for slotIdx in range(0, 3):
@@ -24,7 +23,6 @@ def equipOptionalDevices(curVehicle):
                     BigWorld.player().inventory.equipOptionalDevice(curVehicle.invID, deviceCompactDescr, slotIdx, False, None)
                     LOG_NOTE('equip', curVehicle.name, slotIdx, deviceCompactDescr)
 
-
 def removeAllOptionalDevicesFromVehicle(vehicle):
     if vehicle and not (vehicle.isInBattle or vehicle.isLocked):
         for slotIdx in range(0, 3):
@@ -33,19 +31,16 @@ def removeAllOptionalDevicesFromVehicle(vehicle):
                 BigWorld.player().inventory.equipOptionalDevice(vehicle.invID, 0, slotIdx, False, None)
                 LOG_NOTE('remove:', vehicle.name, slotIdx, device.name)
 
-
 def removeAllOptionalDevices(curVehicle):
     vehicles = g_itemsCache.items.getVehicles(REQ_CRITERIA.INVENTORY).values()
     for vehicle in vehicles:
         if curVehicle.intCD != vehicle.intCD:
             removeAllOptionalDevicesFromVehicle(vehicle)
 
-
 def returnCrew(curVehicle):
     if not curVehicle.isCrewFull:
         BigWorld.player().inventory.returnCrew(curVehicle.invID, None)
         LOG_NOTE('return crew: %s' % curVehicle.name)
-
 
 def equipCurrentVehicle():
     if g_vAppearance is not None:
@@ -61,7 +56,6 @@ def equipCurrentVehicle():
         else:
             BigWorld.callback(0.2, equipCurrentVehicle)
 
-
 def new_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback):
     old_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback)
     try:
@@ -74,7 +68,6 @@ def new_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback):
     except:
         LOG_CURRENT_EXCEPTION()
 
-
 def saveDeviceOnVehicle(vehicle, deviceId, slotId, isRemove):
     LOG_NOTE('save', vehicle.name, slotId, deviceId)
     g_xmlSetting.write(vehicle.name, '')
@@ -84,19 +77,16 @@ def saveDeviceOnVehicle(vehicle, deviceId, slotId, isRemove):
         g_xmlSetting[vehicle.name].writeInt('slot' + str(slotId + 1), int(deviceId))
     g_xmlSetting.save()
 
-
 def new_setVehicleModule(self, newId, slotIdx, oldId, isRemove):
     old_setVehicleModule(self, newId, slotIdx, oldId, isRemove)
     vehicle = g_currentVehicle.item
     saveDeviceOnVehicle(vehicle, newId, slotIdx, isRemove)
-
 
 init = lambda : None
 fini = lambda : None
 onAccountBecomePlayer = lambda : None
 onAccountBecomeNonPlayer = lambda : None
 onAvatarBecomePlayer = lambda : None
-
 
 def onAccountShowGUI(ctx):
     global g_xmlSetting

@@ -19,7 +19,6 @@ if g_xmlConfig:
     g_color = g_xmlConfig.readBool('color', True)
     LOG_NOTE('config is loaded')
 
-
 def new_handleKey(self, isDown, key, mods):
     global g_active
     global g_key
@@ -35,10 +34,8 @@ def new_handleKey(self, isDown, key, mods):
             return True
     return old_handleKey(self, isDown, key, mods)
 
-
 old_handleKey = PlayerAvatar.handleKey
 PlayerAvatar.handleKey = new_handleKey
-
 
 def initLasers():
     global g_entries
@@ -82,7 +79,6 @@ def initLasers():
     if type(BigWorld.player()) is not Account.PlayerAccount:
         BigWorld.callback(0.2, lambda : initLasers())
 
-
 def reloadLasers():
     global g_entries
     aih = BigWorld.player().inputHandler
@@ -91,7 +87,6 @@ def reloadLasers():
     else:
         g_entries = {}
         initLasers()
-
 
 g_playerEvents.onAvatarReady += reloadLasers
 

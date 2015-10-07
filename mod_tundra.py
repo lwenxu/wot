@@ -34,6 +34,8 @@ def new_onControlModeChanged(self, eMode, **args):
         BigWorld.wg_enableTreeHiding(False)
         BigWorld.wg_enableTreeTransparency(True)
 
+old_onControlModeChanged = AvatarInputHandler.onControlModeChanged
+AvatarInputHandler.onControlModeChanged = new_onControlModeChanged
 
 def new_handleKey(self, isDown, key, mods):
     global g_tundra
@@ -68,6 +70,8 @@ def new_handleKey(self, isDown, key, mods):
             return True
     return old_handleKey(self, isDown, key, mods)
 
+old_handleKey = PlayerAvatar.handleKey
+PlayerAvatar.handleKey = new_handleKey
 
 def new_onEnterWorld(self, prereqs):
     global g_fullTundra
@@ -76,11 +80,6 @@ def new_onEnterWorld(self, prereqs):
     BigWorld.wg_enableTreeHiding(False)
     BigWorld.wg_enableTreeTransparency(True)
 
-
-old_onControlModeChanged = AvatarInputHandler.onControlModeChanged
-AvatarInputHandler.onControlModeChanged = new_onControlModeChanged
-old_handleKey = PlayerAvatar.handleKey
-PlayerAvatar.handleKey = new_handleKey
 old_onEnterWorld = PlayerAvatar.onEnterWorld
 PlayerAvatar.onEnterWorld = new_onEnterWorld
 
