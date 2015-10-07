@@ -15,30 +15,23 @@ g_returnCrew = True
 
 
 def equipOptionalDevices(curVehicle):
-    global g_xmlSetting
-    try:
-        if g_xmlSetting[curVehicle.name]:
-            for slotIdx in range(0, 3):
-                device = curVehicle.descriptor.optionalDevices[slotIdx]
-                if not device:
-                    deviceCompactDescr = g_xmlSetting[curVehicle.name].readInt('slot' + str(slotIdx + 1), 0)
-                    if deviceCompactDescr is not 0:
-                        BigWorld.player().inventory.equipOptionalDevice(curVehicle.invID, deviceCompactDescr, slotIdx, False, None)
-                        LOG_NOTE('equip', curVehicle.name, slotIdx, deviceCompactDescr)
-    except:
-        LOG_CURRENT_EXCEPTION()
+    if g_xmlSetting[curVehicle.name]:
+        for slotIdx in range(0, 3):
+            device = curVehicle.descriptor.optionalDevices[slotIdx]
+            if not device:
+                deviceCompactDescr = g_xmlSetting[curVehicle.name].readInt('slot' + str(slotIdx + 1), 0)
+                if deviceCompactDescr is not 0:
+                    BigWorld.player().inventory.equipOptionalDevice(curVehicle.invID, deviceCompactDescr, slotIdx, False, None)
+                    LOG_NOTE('equip', curVehicle.name, slotIdx, deviceCompactDescr)
 
 
 def removeAllOptionalDevicesFromVehicle(vehicle):
-    try:
-        if vehicle and not (vehicle.isInBattle or vehicle.isLocked):
-            for slotIdx in range(0, 3):
-                device = vehicle.descriptor.optionalDevices[slotIdx]
-                if device and device.removable:
-                    BigWorld.player().inventory.equipOptionalDevice(vehicle.invID, 0, slotIdx, False, None)
-                    LOG_NOTE('remove:', vehicle.name, slotIdx, device.name)
-    except:
-        LOG_CURRENT_EXCEPTION()
+    if vehicle and not (vehicle.isInBattle or vehicle.isLocked):
+        for slotIdx in range(0, 3):
+            device = vehicle.descriptor.optionalDevices[slotIdx]
+            if device and device.removable:
+                BigWorld.player().inventory.equipOptionalDevice(vehicle.invID, 0, slotIdx, False, None)
+                LOG_NOTE('remove:', vehicle.name, slotIdx, device.name)
 
 
 def removeAllOptionalDevices(curVehicle):
@@ -49,21 +42,17 @@ def removeAllOptionalDevices(curVehicle):
 
 
 def returnCrew(curVehicle):
-    global g_returnCrew
     if not curVehicle.isCrewFull:
         BigWorld.player().inventory.returnCrew(curVehicle.invID, None)
         LOG_NOTE('return crew: %s' % curVehicle.name)
 
 
 def equipCurrentVehicle():
-    global g_autoEquip
-    global g_returnCrew
-    global g_vAppearance
     if g_vAppearance is not None:
         if g_vAppearance._VehicleAppearance__isLoaded:
             if g_currentVehicle.isInHangar():
                 curVehicle = g_currentVehicle.item
-                LOG_NOTE('try to equip: %s' % curVehicle.name)
+                #LOG_NOTE('try to equip: %s' % curVehicle.name)
                 if g_autoEquip:
                     removeAllOptionalDevices(curVehicle)
                     equipOptionalDevices(curVehicle)
@@ -74,7 +63,6 @@ def equipCurrentVehicle():
 
 
 def new_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback):
-    global old_recreateVehicle
     old_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback)
     try:
         global g_vAppearance
@@ -88,7 +76,7 @@ def new_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback):
 
 
 def saveDeviceOnVehicle(vehicle, deviceId, slotId, isRemove):
-    #LOG_NOTE('save', vehicle.name, slotId, deviceId)
+    LOG_NOTE('save', vehicle.name, slotId, deviceId)
     g_xmlSetting.write(vehicle.name, '')
     if isRemove:
         g_xmlSetting[vehicle.name].writeInt('slot' + str(slotId + 1), 0)
@@ -98,7 +86,6 @@ def saveDeviceOnVehicle(vehicle, deviceId, slotId, isRemove):
 
 
 def new_setVehicleModule(self, newId, slotIdx, oldId, isRemove):
-    global old_setVehicleModule
     old_setVehicleModule(self, newId, slotIdx, oldId, isRemove)
     vehicle = g_currentVehicle.item
     saveDeviceOnVehicle(vehicle, newId, slotIdx, isRemove)
@@ -113,19 +100,26 @@ onAvatarBecomePlayer = lambda : None
 
 def onAccountShowGUI(ctx):
     global g_xmlSetting
+    global g_autoEquip
+    global g_returnCrew
     global g_prevVehicleID
     global g_started
     global old_setVehicleModule
     global old_recreateVehicle
     if g_started: return
     g_xmlSetting = ResMgr.openSection('scripts/client/gui/mods/mod_auto_equip.xml', True)
-    if not g_xmlSetting:
+    if g_xmlSetting:
+        g_autoEquip = g_xmlSetting.readBool('autoEquip', True)
+        g_returnCrew = g_xmlSetting.readBool('returnCrew', True)
+    else:
+        g_xmlSetting.writeBool('autoEquip', True)
+        g_xmlSetting.writeBool('returnCrew', True)
         g_xmlSetting.save()
     g_prevVehicleID = g_currentVehicle.item.intCD
     old_setVehicleModule = AmmunitionPanel.setVehicleModule
     AmmunitionPanel.setVehicleModule = new_setVehicleModule
     old_recreateVehicle = ClientHangarSpace.recreateVehicle
     ClientHangarSpace.recreateVehicle = new_recreateVehicle
-    SystemMessages.pushMessage('AutoEquip 0.9.10 started')
+    SystemMessages.pushMessage('Hangar Mod 0.9.10 started')
     g_started = True
 
