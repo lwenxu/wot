@@ -1,39 +1,32 @@
 #!/bin/make -f
 
-.PHONY: all clean tags install release
+.PHONY: all clean install release
 
 sources = $(wildcard mod_*.c)
 targets = $(sources:.py=.pyc)
 
-WOTDIR = ./wot
+WOTDIR = /cygdrive/c/games/WOT
 wotver = 0.9.10
 wotmod = res_mods/$(wotver)
 wotmod_scripts = $(wotmod)/scripts/client/gui/mods
 wotmod_configs = $(wotmod)/scripts/client/gui/mods
 
 all: $(targets)
-
 	python -m compileall mod_*.py
 
 clean:
-
 	rm *.pyc
 
-tags:
-
-	ctags -R -n --totals=yes
-
 install: all
-
-	cp -f mod_*.pyc $(WOTDIR)/$(wotmod_scripts)
-	cp -rf res/* $(WOTDIR)/$(wotmod)
+	mkdir -p "$(WOTDIR)/$(wotmod_scripts)"
+	cp -f mod_*.pyc "$(WOTDIR)/$(wotmod_scripts)"
+	cp -rf res/* "$(WOTDIR)/$(wotmod)"
 
 release: all
-
-	mkdir -p $(wotmod_scripts)
-	cp -vf mod_*.pyc $(wotmod_scripts)
-	cp -vf xml/mod_reload.xml $(wotmod_configs)
-	cp -rvf res/* $(wotmod)
-	tar cv res_mods/ | bzip2 -c -9 > wotmods-$(wotver).tar.bz2
-	rm -rf res_mods/ 
+	mkdir -p "$(wotmod_scripts)"
+	cp -f mod_*.pyc "$(wotmod_scripts)"
+	cp -f xml/*.xml "$(wotmod_configs)"
+	cp -rf res/* "$(wotmod)"
+	tar c res_mods/ | bzip2 -c -9 > "wotmods-$(wotver).tar.bz2"
+	rm -rf res_mods/
 
