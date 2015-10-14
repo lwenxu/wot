@@ -6,6 +6,7 @@ from gui.ClientHangarSpace import ClientHangarSpace, _VehicleAppearance
 from gui.shared import g_itemsCache, REQ_CRITERIA
 from debug_utils import *
 from gui import SystemMessages
+
 g_xmlSetting = None
 g_prevVehicleID = None
 g_started = False
@@ -21,7 +22,7 @@ def equipOptionalDevices(curVehicle):
                 deviceCompactDescr = g_xmlSetting[curVehicle.name].readInt('slot' + str(slotIdx + 1), 0)
                 if deviceCompactDescr is not 0:
                     BigWorld.player().inventory.equipOptionalDevice(curVehicle.invID, deviceCompactDescr, slotIdx, False, None)
-                    LOG_NOTE('equip', curVehicle.name, slotIdx, deviceCompactDescr)
+                    LOG_DEBUG('equip', curVehicle.name, slotIdx, deviceCompactDescr)
 
 def removeAllOptionalDevicesFromVehicle(vehicle):
     if vehicle and not (vehicle.isInBattle or vehicle.isLocked):
@@ -29,7 +30,7 @@ def removeAllOptionalDevicesFromVehicle(vehicle):
             device = vehicle.descriptor.optionalDevices[slotIdx]
             if device and device.removable:
                 BigWorld.player().inventory.equipOptionalDevice(vehicle.invID, 0, slotIdx, False, None)
-                LOG_NOTE('remove:', vehicle.name, slotIdx, device.name)
+                LOG_DEBUG('remove:', vehicle.name, slotIdx, device.name)
 
 def removeAllOptionalDevices(curVehicle):
     vehicles = g_itemsCache.items.getVehicles(REQ_CRITERIA.INVENTORY).values()
@@ -40,14 +41,14 @@ def removeAllOptionalDevices(curVehicle):
 def returnCrew(curVehicle):
     if not curVehicle.isCrewFull:
         BigWorld.player().inventory.returnCrew(curVehicle.invID, None)
-        LOG_NOTE('return crew: %s' % curVehicle.name)
+        LOG_DEBUG('return crew: %s' % curVehicle.name)
 
 def equipCurrentVehicle():
     if g_vAppearance is not None:
         if g_vAppearance._VehicleAppearance__isLoaded:
             if g_currentVehicle.isInHangar():
                 curVehicle = g_currentVehicle.item
-                #LOG_NOTE('try to equip: %s' % curVehicle.name)
+                #LOG_DEBUG('try to equip: %s' % curVehicle.name)
                 if g_autoEquip:
                     removeAllOptionalDevices(curVehicle)
                     equipOptionalDevices(curVehicle)
@@ -69,7 +70,7 @@ def new_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback):
         LOG_CURRENT_EXCEPTION()
 
 def saveDeviceOnVehicle(vehicle, deviceId, slotId, isRemove):
-    LOG_NOTE('save', vehicle.name, slotId, deviceId)
+    LOG_DEBUG('save', vehicle.name, slotId, deviceId)
     g_xmlSetting.write(vehicle.name, '')
     if isRemove:
         g_xmlSetting[vehicle.name].writeInt('slot' + str(slotId + 1), 0)
@@ -110,6 +111,6 @@ def onAccountShowGUI(ctx):
     AmmunitionPanel.setVehicleModule = new_setVehicleModule
     old_recreateVehicle = ClientHangarSpace.recreateVehicle
     ClientHangarSpace.recreateVehicle = new_recreateVehicle
-    SystemMessages.pushMessage('Hangar Mod 0.9.10 started')
+    SystemMessages.pushMessage('LWP Hangar Mod 0.9.10 started')
     g_started = True
 
