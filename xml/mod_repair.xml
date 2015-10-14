@@ -1,0 +1,16 @@
+<mod_repair.xml>
+	<autoExtinguisher> true </autoExtinguisher>
+	<trackRepairKey> KEY_SPACE </trackRepairKey>
+
+	<!-- ammobay, gun, turretRotator(crit), engine(crit), track(crit), surveyingDevice(crit) -->
+	<autoRepair> ammobay, gun, engine </autoRepair>
+
+	<!-- commander, radioman, driver, gunner, loader -->
+	<autoHeal> loader, gunner </autoHeal>
+
+	<!-- Classes specific: lightTank, mediumTank, heavyTank, AT-SPG, SPG -->
+	<lightTank>
+		<autoRepair> engine, track </autoRepair>
+		<autoHeal> driver </autoHeal>
+	</lightTank>
+</mod_repair.xml>
