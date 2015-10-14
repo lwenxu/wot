@@ -1,33 +1,10 @@
 <mod_reload.xml>
-    <active> true </active>
     <key> KEY_NUMPAD4 </key>
-
-    <!-- вкл. союзников по умолчанию -->
     <allies> true </allies>
-    <!-- вкл. отображения перезарядки союзников в начале битвы -->
-    <alliesAtStart> true </alliesAtStart>
-    <!-- рaзрешить показывать перезарядку у техники пропавшей из вида -->
     <unvisible> true </unvisible>
-
-    <!-- учитывать боевое братство -->
     <bonusBrotherhood> true </bonusBrotherhood>
-    <!-- учитывать доп.паёк -->
     <bonusStimulator> false </bonusStimulator>
-    <!-- учитывать боевое братство и доп.паёк автоматически при боях на ГК и КБ -->
     <bonusAuto> true </bonusAuto>
-
-    <!-- считать барабан перезаряженным, если танк не открывал огонь в течении времени перезарядки -->
-    <timeOutAutoReload> true </timeOutAutoReload>
-    <!-- добавочное время к timeOutAutoReload, в сек. -->
-    <timeOutReloadDelay> 3.0 </timeOutReloadDelay>
-
-    <!-- маркер противника -->
     <enemiesMarker> marker_red.swf </enemiesMarker>
-    <!-- маркер союзника -->
     <alliesMarker> marker_green.swf </alliesMarker>
-
-    <!-- частота проверки маркера в сек. -->
-    <marker_timeUpdate>0.5</marker_timeUpdate>
-    <!-- корректировка задержки отключения маркера (добавочное время), в сек. -->
-    <marker_timeCorrect>0.5</marker_timeCorrect>
 </mod_reload.xml>

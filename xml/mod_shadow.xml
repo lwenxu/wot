@@ -1,6 +1,4 @@
 <mod_shadow.xml>
-    <active> true </active>
     <key> KEY_NUMPAD5 </key>
     <delay> 20 </delay>
-    <caption> true </caption>
 </mod_shadow.xml>

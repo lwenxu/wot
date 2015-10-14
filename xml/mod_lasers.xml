@@ -1,5 +1,4 @@
 <mod_lasers.xml>
-    <active> true </active>
     <key> KEY_NUMPAD3 </key>
     <color> true </color>
 </mod_lasers.xml>
