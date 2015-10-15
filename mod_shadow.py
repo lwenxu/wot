@@ -21,7 +21,7 @@ if g_xmlConfig:
     else:
         g_active = False
     g_key = getattr(Keys, g_xmlConfig.readString('key', 'KEY_NUMPAD5'))
-    LOG_DEBUG('config is loaded')
+    LOG_NOTE('config is loaded')
 
 def new_handleKey(self, isDown, key, mods):
     global g_active
@@ -68,8 +68,7 @@ def new_addStippleModel(self, vehID):
         TransBoundingBox.source = model.bounds
         TransBoundingBox.my_string.position = (0.5, 0.75, 0)
         GUI.addRoot(TransBoundingBox)
-        LOG_DEBUG('add shadow: id=%d' % vehID)
-        g_shadows_list.append({'time': BigWorld.time(), 'bb': TransBoundingBox, 'id': vehID})
+        g_shadows_list.append({'time': BigWorld.time(), 'bb': TransBoundingBox})
         BigWorld.callback(g_delay, delBoundingBox)
         callbackID = BigWorld.callback(g_delay, partial(self._StippleManager__removeStippleModel, vehID))
     else:
@@ -80,37 +79,9 @@ def delBoundingBox():
     global g_shadows_list
     for value in g_shadows_list:
         if BigWorld.time() - value['time'] >= g_delay:
-            LOG_DEBUG('timer: remove: id=%d' % value['id'])
             GUI.delRoot(value['bb'])
             g_shadows_list.remove(value)
 
 VehicleAppearance = StippleManager._StippleManager__addStippleModel
 StippleManager._StippleManager__addStippleModel = new_addStippleModel
 
-'''
-from gui.Scaleform.Battle import Battle
-
-def onVehicleKilled(targetID, atackerID, *args):
-    global g_shadows_list
-    LOG_DEBUG('killed: id=%d' % targetID)
-    for value in g_shadows_list:
-        if value['id'] == targetID:
-            LOG_DEBUG('killed: remove: id=%d' % value['id'])
-            GUI.delRoot(value['bb'])
-            g_shadows_list.remove(value)
-            return
-
-def new_startBattle(current):
-    BigWorld.player().arena.onVehicleKilled += onVehicleKilled
-    old_startBattle(current)
-
-old_startBattle = Battle.afterCreate
-Battle.afterCreate = new_startBattle
-
-def new_stopBattle(current):
-    BigWorld.player().arena.onVehicleKilled -= onVehicleKilled
-    old_stopBattle(current)
-
-old_stopBattle = Battle.beforeDelete
-Battle.beforeDelete = new_stopBattle
-'''
