@@ -16,16 +16,23 @@ old_as_setFireInVehicleS = DamagePanel.as_setFireInVehicleS
 DamagePanel.as_setFireInVehicleS = new_as_setFireInVehicleS
 
 g_dev_state = {}
-g_auto_repair_critical = ['ammoBay']
-g_auto_repair_destroyed = ['gun', 'turretRotator']
+g_auto_repair = ['ammoBay', 'gun']
+g_repair_critical =  ['engine', 'ammoBay', 'radio']
+g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio']
+# ['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio']
 
 def new_as_updateDeviceStateS(self, deviceName, deviceState):
     global g_dev_state
     old_as_updateDeviceStateS(self, deviceName, deviceState)
     g_dev_state[deviceName] = deviceState
-    if deviceState == 'critical' and deviceName in g_auto_repair_critical:
+    if deviceState == 'critical' and deviceName in g_auto_repair and deviceName in g_repair_critical:
         BigWorld.callback(0.01, partial(g_sessionProvider.getEquipmentsCtrl().changeSettingByTag, 'repairkit', deviceName, BigWorld.player()))
         LOG_NOTE('%s repaired' % deviceName)
+        return
+    if deviceState == 'destroyed' and deviceName in g_auto_repair and deviceName in g_repair_destroyed:
+        BigWorld.callback(0.01, partial(g_sessionProvider.getEquipmentsCtrl().changeSettingByTag, 'repairkit', deviceName, BigWorld.player()))
+        LOG_NOTE('%s repaired' % deviceName)
+        return
 
 old_as_updateDeviceStateS = DamagePanel.as_updateDeviceStateS
 DamagePanel.as_updateDeviceStateS = new_as_updateDeviceStateS
