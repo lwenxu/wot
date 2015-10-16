@@ -2,8 +2,8 @@
 	<autoExtinguisher> true </autoExtinguisher>
 	<trackRepairKey> KEY_SPACE </trackRepairKey>
 
-	<!-- ammobay, gun, turretRotator(crit), engine(crit), track(crit), surveyingDevice(crit) -->
-	<autoRepair> ammobay, gun, engine </autoRepair>
+	<!-- engine, ammoBay, gun, turretRotator, surveyingDevice, radio, fuelTank -->
+	<autoRepair> ammoBay </autoRepair>
 
 	<!-- commander, radioman, driver, gunner, loader -->
 	<autoHeal> loader, gunner </autoHeal>
