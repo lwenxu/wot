@@ -5,10 +5,10 @@ from gui.app_loader import g_appLoader
 from AvatarInputHandler import AvatarInputHandler
 from Avatar import PlayerAvatar
 from debug_utils import *
+
 g_tundra = True
 g_fullTundra = False
 g_key = Keys.KEY_NUMPAD2
-
 g_xmlConfig = ResMgr.openSection('scripts/client/gui/mods/mod_tundra.xml')
 if g_xmlConfig:
     g_key = getattr(Keys, g_xmlConfig.readString('key', 'KEY_NUMPAD2'))
@@ -16,8 +16,6 @@ if g_xmlConfig:
     LOG_NOTE('config is loaded')
 
 def new_onControlModeChanged(self, eMode, **args):
-    global g_tundra
-    global g_fullTundra
     old_onControlModeChanged(self, eMode, **args)
     if eMode == 'sniper':
         if g_tundra:
@@ -40,7 +38,6 @@ AvatarInputHandler.onControlModeChanged = new_onControlModeChanged
 def new_handleKey(self, isDown, key, mods):
     global g_tundra
     global g_fullTundra
-    global g_key
     if key == g_key and mods == 0 and isDown:
         if g_appLoader.getDefBattleApp() is not None:
             player = BigWorld.player()
