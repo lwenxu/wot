@@ -310,7 +310,6 @@ class MarkerReLoad(object):
             if self.disabled:
                 return
             id = targetID
-            LOG_DEBUG('vehicle %d killed' % id)
             if id in self.visible_list:
                 self.visible_list.remove(id)
             if self.enemies_list.has_key(id):

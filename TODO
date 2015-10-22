@@ -13,12 +13,13 @@ mod_tundra            | NUM2  |
 +mod_auto_extinguisher + mod_repair_track + repair_other --> mod_repair
 +mod_render_model --> mod_render
 +mod_shadow: check isAlive
+-mod_reload: move new handlers to funcs
 
 FIXME 0.10.0:
 +mod_shadow - shadows remains
 +mod_render - outline of dead vehicles
 +mod_reload - doesnt work
--mod_reload - marker_green.swf - timer font issue
++mod_reload - marker_green.swf - timer font issue
 -mod_shadow - shadow caption issue
 
 --
