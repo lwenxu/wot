@@ -56,19 +56,24 @@ def new_addStippleModel(self, vehID):
         vehicleType = unicode(vehicle['vehicleType'].type.shortUserString, 'utf-8')
         TransBoundingBox = GUI.BoundingBox('objects/shadow/null.dds')
         TransBoundingBox.size = (0.05, 0.05)
-        my_info = '\\cFF4949FF;' + vehicleType
-        TransBoundingBox.my_string = GUI.Text(my_info)
-        TransBoundingBox.my_string.colourFormatting = True
-        TransBoundingBox.my_string.colour = (255, 0, 0, 255)
-        TransBoundingBox.my_string.font = 'hpmp_panel.font'
-        TransBoundingBox.my_string.horizontalPositionMode = TransBoundingBox.my_string.verticalPositionMode = 'CLIP'
-        TransBoundingBox.my_string.widthMode = TransBoundingBox.my_string.heightMode = 'PIXEL'
-        TransBoundingBox.my_string.verticalAnchor = 'CENTER'
-        TransBoundingBox.my_string.horizontalAnchor = 'CENTER'
+        '''
+        #ERROR: AttributeError: GUI.Text: The requested font does not exist.
+        TransBoundingBox.shadowText = GUI.Text('\\cFF4949FF;' + vehicleType)
+        TransBoundingBox.shadowText.colourFormatting = True
+        TransBoundingBox.shadowText.colour = (255, 0, 0, 255)
+        TransBoundingBox.shadowText.font = 'hpmp_panel.font'
+        TransBoundingBox.shadowText.horizontalPositionMode = 'CLIP'
+        TransBoundingBox.shadowText.verticalPositionMode = 'CLIP'
+        TransBoundingBox.shadowText.widthMode = 'PIXEL'
+        TransBoundingBox.shadowText.heightMode = 'PIXEL'
+        TransBoundingBox.shadowText.verticalAnchor = 'CENTER'
+        TransBoundingBox.shadowText.horizontalAnchor = 'CENTER'
+        TransBoundingBox.shadowText.position = (0.5, 0.75, 0)
+        '''
         TransBoundingBox.source = model.bounds
-        TransBoundingBox.my_string.position = (0.5, 0.75, 0)
         GUI.addRoot(TransBoundingBox)
-        g_shadows_list.append({'time': BigWorld.time(), 'bb': TransBoundingBox})
+        g_shadows_list.append({'time': BigWorld.time(), 'bb': TransBoundingBox, 'id': vehID})
+        LOG_DEBUG('add %d' % vehID)
         BigWorld.callback(g_delay, delBoundingBox)
         callbackID = BigWorld.callback(g_delay, partial(self._StippleManager__removeStippleModel, vehID))
     else:
@@ -79,9 +84,11 @@ def delBoundingBox():
     global g_shadows_list
     for value in g_shadows_list:
         if BigWorld.time() - value['time'] >= g_delay:
+            LOG_DEBUG('del %d' % value['id'])
             GUI.delRoot(value['bb'])
             g_shadows_list.remove(value)
 
 VehicleAppearance = StippleManager._StippleManager__addStippleModel
 StippleManager._StippleManager__addStippleModel = new_addStippleModel
+
 

@@ -3,14 +3,12 @@ from Vehicle import Vehicle
 from Avatar import PlayerAvatar
 from debug_utils import *
 
-
 def addEdge(vehicle):
     if isinstance(vehicle, Vehicle):
-        if vehicle.isStarted:
-            if not vehicle.isPlayer:
-                if vehicle.isAlive():
-                    if vehicle.publicInfo['team'] is not BigWorld.player().team:
-                        BigWorld.wgAddEdgeDetectEntity(vehicle, 0, False)
+        if vehicle.isStarted and not vehicle.isPlayer and vehicle.isAlive():
+            if vehicle.publicInfo['team'] is not BigWorld.player().team:
+                vehicle.drawEdge(0, 0, False)
+                #LOG_DEBUG("add edge %d" % vehicle.id)
 
 def new_startVisual(current):
     old_startVisual(current)

@@ -1,4 +1,3 @@
-
 lwp - light wp
 
                       | key   | previous authors
@@ -17,3 +16,7 @@ mod_tundra            | NUM2  |
 +mod_render_model --> mod_render
 +mod_shadow: check isAlive
 
+FIXME 0.10.0:
+mod_shadow - shadows remains
+mod_render - outline of dead vehicles
+mod_reload - doesnt work
