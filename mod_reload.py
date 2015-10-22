@@ -107,6 +107,7 @@ class MarkerReLoad(object):
                                 enout = BigWorld.time() + reload_time + self.marker_timeCorrect
                                 Mod_Marker.showActionMarker(mm_handle, 'attack', int(reload_time))
                         except:
+                            LOG_CURRENT_EXCEPTION()
                             return
                         finally:
 
@@ -477,7 +478,7 @@ class _VehicleMarkersManager(Flash):
     def createMarker(self, vProxy):
         mProv = vProxy.model.node('HP_gui')
         handle = self.__ownUI.addMarker(mProv, 'VehicleMarkerEnemy')
-        self.invokeMarker(handle, 'init', [])
+        self.invokeMarker(handle, 'init')
         return handle
 
     def showActionMarker(self, handle, newState = '', time_value = 0):
@@ -485,8 +486,5 @@ class _VehicleMarkersManager(Flash):
 
     def invokeMarker(self, handle, function, args = None):
         if handle != -1:
-            if args is None:
-                args = []
             self.__ownUI.markerInvoke(handle, (function, args))
-        return
 
