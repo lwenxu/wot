@@ -73,7 +73,7 @@ def new_addStippleModel(self, vehID):
         TransBoundingBox.source = model.bounds
         GUI.addRoot(TransBoundingBox)
         g_shadows_list.append({'time': BigWorld.time(), 'bb': TransBoundingBox, 'id': vehID})
-        LOG_DEBUG('add %d' % vehID)
+        #LOG_DEBUG('add %d' % vehID)
         BigWorld.callback(g_delay, delBoundingBox)
         callbackID = BigWorld.callback(g_delay, partial(self._StippleManager__removeStippleModel, vehID))
     else:
@@ -84,7 +84,7 @@ def delBoundingBox():
     global g_shadows_list
     for value in g_shadows_list:
         if BigWorld.time() - value['time'] >= g_delay:
-            LOG_DEBUG('del %d' % value['id'])
+            #LOG_DEBUG('del %d' % value['id'])
             GUI.delRoot(value['bb'])
             g_shadows_list.remove(value)
 

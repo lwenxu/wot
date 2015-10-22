@@ -1,22 +1,25 @@
-lwp - light wp
 
                       | key   | previous authors
 ----------------------+-------+-------------------
 mod_auto_equip        |       | Skino88
 mod_lasers            | NUM3  | 
 mod_reload            | NUM4  | Inferno66, lportii
-mod_render            | NUM1  |
+mod_render            |       |
 mod_repair            | SPACE | lsdmax
 mod_shadow            | NUM5  | Qumi
 mod_tundra            | NUM2  |
 
-
-+mod_auto_equip + crew auto return --> mod_hangar (mod_auto_return)
++mod_auto_equip + crew auto return --> mod_hangar (mod_auto_ret
 +mod_auto_extinguisher + mod_repair_track + repair_other --> mod_repair
 +mod_render_model --> mod_render
 +mod_shadow: check isAlive
 
 FIXME 0.10.0:
-mod_shadow - shadows remains
-mod_render - outline of dead vehicles
-mod_reload - doesnt work
++mod_shadow - shadows remains
++mod_render - outline of dead vehicles
++mod_reload - doesnt work
+-mod_reload - marker_green.swf - timer font issue
+-mod_shadow - shadow caption issue
+
+--
+lwp - light wp
