@@ -16,8 +16,8 @@ old_as_setFireInVehicleS = DamagePanel.as_setFireInVehicleS
 DamagePanel.as_setFireInVehicleS = new_as_setFireInVehicleS
 
 g_dev_state = {}
-g_auto_repair = ['ammoBay', 'gun']
-g_repair_critical =  ['engine', 'ammoBay', 'radio']
+g_auto_repair = ['ammoBay']
+g_repair_critical =  ['engine', 'ammoBay', 'gun', 'radio']
 g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio']
 # ['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio']
 
