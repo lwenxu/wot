@@ -9,7 +9,7 @@ g_key = Keys.KEY_SPACE
 g_auto_extinguisher = True
 g_dev_state = {}
 g_auto_repair = ['ammoBay']
-g_auto_heal = ['loader', 'gunner']
+g_auto_heal = ['loader']
 g_repair_critical =  ['engine', 'ammoBay', 'gun', 'radio']
 g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio']
 #g_repair_all = ['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio']
@@ -53,7 +53,7 @@ def new_as_updateDeviceStateS(self, deviceName, deviceState):
         return
     elif deviceState in ('critical', 'destroyed') and deviceName in g_auto_heal:
         BigWorld.callback(0.01, partial(g_sessionProvider.getEquipmentsCtrl().changeSettingByTag, 'medkit', deviceName, BigWorld.player()))
-        LOG_NOTE('%s repaired' % deviceName)
+        LOG_NOTE('%s healed' % deviceName)
         return
 
 old_as_updateDeviceStateS = DamagePanel.as_updateDeviceStateS
