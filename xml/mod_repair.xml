@@ -1,12 +1,12 @@
 <mod_repair.xml>
 	<autoExtinguisher> true </autoExtinguisher>
-	<trackRepairKey> KEY_SPACE </trackRepairKey>
+	<fastRepairKey> KEY_SPACE </fastRepairKey>
 
 	<!-- engine, ammoBay, gun, turretRotator, surveyingDevice, radio, fuelTank -->
-	<autoRepair> ammoBay </autoRepair>
+	<autoRepair> ammoBay, gun </autoRepair>
 
 	<!-- commander, radioman, driver, gunner, loader -->
-	<autoHeal> loader, gunner </autoHeal>
+	<autoHeal> loader, gunner, driver </autoHeal>
 
 	<!-- Classes specific: lightTank, mediumTank, heavyTank, AT-SPG, SPG -->
 	<lightTank>
