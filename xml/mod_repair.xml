@@ -3,14 +3,26 @@
 	<fastRepairKey> KEY_SPACE </fastRepairKey>
 
 	<!-- engine, ammoBay, gun, turretRotator, surveyingDevice, radio, fuelTank -->
-	<autoRepair> ammoBay, gun </autoRepair>
+	<autoRepair> ammoBay </autoRepair>
 
 	<!-- commander, radioman, driver, gunner, loader -->
-	<autoHeal> loader, gunner, driver </autoHeal>
+	<autoHeal> loader </autoHeal>
 
 	<!-- Classes specific: lightTank, mediumTank, heavyTank, AT-SPG, SPG -->
 	<lightTank>
 		<autoRepair> engine, track </autoRepair>
-		<autoHeal> driver </autoHeal>
+		<autoHeal> commander, driver </autoHeal>
 	</lightTank>
+	<mediumTank>
+		<autoRepair> engine, ammoBay, gun </autoRepair>
+		<autoHeal> commander, driver, gunner, loader </autoHeal>
+	</mediumTank>
+	<heavyTank>
+		<autoRepair> ammoBay, gun </autoRepair>
+		<autoHeal> gunner, loader </autoHeal>
+	</heavyTank>
+	<AT-SPG>
+		<autoRepair> ammoBay, gun </autoRepair>
+		<autoHeal> gunner, loader </autoHeal>
+	</AT-SPG>
 </mod_repair.xml>
