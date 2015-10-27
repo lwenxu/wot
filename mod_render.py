@@ -1,14 +1,15 @@
 import BigWorld
 from Vehicle import Vehicle
 from Avatar import PlayerAvatar
+from gui.Scaleform.Battle import Battle
 from debug_utils import *
 
 def addEdge(vehicle):
     if isinstance(vehicle, Vehicle):
         if vehicle.isStarted and not vehicle.isPlayer and vehicle.isAlive():
             if vehicle.publicInfo['team'] is not BigWorld.player().team:
-                vehicle.drawEdge(0, 0, False)
                 #LOG_DEBUG("add edge %d" % vehicle.id)
+                BigWorld.wgAddEdgeDetectEntity(vehicle, 0, 0, False)
 
 def new_startVisual(current):
     old_startVisual(current)
@@ -38,3 +39,22 @@ def new_targetFocus(current, entity):
 old_targetFocus = PlayerAvatar.targetFocus
 PlayerAvatar.targetFocus = new_targetFocus
 
+def onVehicleKilled(targetID, atackerID, *args):
+    vehicle = BigWorld.entity(targetID)
+    if vehicle and vehicle.isStarted and not vehicle.isPlayer:
+        if vehicle.publicInfo['team'] is not BigWorld.player().team:
+            BigWorld.wgDelEdgeDetectEntity(vehicle)
+
+def new_startBattle(current):
+    BigWorld.player().arena.onVehicleKilled += onVehicleKilled
+    old_startBattle(current)
+
+old_startBattle = Battle.afterCreate
+Battle.afterCreate = new_startBattle
+
+def new_stopBattle(current):
+    BigWorld.player().arena.onVehicleKilled -= onVehicleKilled
+    old_stopBattle(current)
+
+old_stopBattle = Battle.beforeDelete
+Battle.beforeDelete = new_stopBattle

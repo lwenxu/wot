@@ -240,7 +240,12 @@ class MarkerReLoad(object):
             return hasattr(BigWorld.player(), 'arena')
 
         def __getIsLive(id):
-            return __getBattleOn() and BigWorld.player().arena.vehicles.get(id)['isAlive']
+            #0.10.0 hotfix
+            veh = BigWorld.player().arena.vehicles.get(id)
+            if veh:
+                return __getBattleOn() and veh['isAlive']
+            else:
+                return False
 
         def __getIsFriendly(id):
             return __getBattleOn() and BigWorld.player().arena.vehicles[BigWorld.player().playerVehicleID]['team'] == BigWorld.player().arena.vehicles[id]['team']
@@ -475,6 +480,7 @@ class _VehicleMarkersManager(Flash):
         return
 
     def createMarker(self, vProxy):
+        if not vProxy: return None
         mProv = vProxy.model.node('HP_gui')
         handle = self.__ownUI.addMarker(mProv, 'VehicleMarkerEnemy')
         self.invokeMarker(handle, 'init')
