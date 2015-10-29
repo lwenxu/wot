@@ -9,17 +9,19 @@ from debug_utils import *
 g_key = Keys.KEY_SPACE
 g_auto_extinguisher = True
 g_dev_state = {}
-#['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio']
-#['commander', 'radioman', 'driver', 'gunner', 'loader']
+#['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
 g_auto_repair = {}
 g_auto_repair['all'] = ['ammoBay']
+#['commander', 'radioman', 'driver', 'gunner', 'loader']
 g_auto_heal = {}
 g_auto_heal['all'] = ['loader']
 for classTag in vehicles.VEHICLE_CLASS_TAGS:
     g_auto_repair[classTag] = g_auto_repair['all']
     g_auto_heal[classTag] = g_auto_heal['all']
+g_auto_repair['lightTank'] = ['engine']
+g_auto_heal['lightTank'] = ['driver']
 g_repair_critical =  ['engine', 'ammoBay', 'gun', 'radio']
-g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio']
+g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
 g_xml = ResMgr.openSection('scripts/client/gui/mods/mod_repair.xml')
 if g_xml:
     g_auto_extinguisher = g_xml.readBool('autoExtinguisher', True)

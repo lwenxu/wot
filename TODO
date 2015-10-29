@@ -1,10 +1,11 @@
+lwp - light wp
 
                       | key   | previous authors
 ----------------------+-------+-------------------
 mod_auto_equip        |       | Skino88
 mod_lasers            | NUM3  | 
 mod_reload            | NUM4  | Inferno66, lportii
-mod_render            |       |
+mod_render            | NUM1  |
 mod_repair            | SPACE | lsdmax
 mod_shadow            | NUM5  | Qumi
 mod_tundra            | NUM2  |
@@ -22,5 +23,12 @@ FIXME 0.10.0:
 +mod_reload - marker_green.swf - timer font issue
 -mod_shadow - shadow caption issue
 
---
-lwp - light wp
+mod_auto_equip
+mod_auto_repair
+mod_meta_target:
+ -reload markers
+ -shadow
+ -tundra on alt
+ -silhouette of visible part of collide enemy
+ -direction indicator
+
