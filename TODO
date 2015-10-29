@@ -9,7 +9,7 @@ mod_repair            | SPACE | lsdmax
 mod_shadow            | NUM5  | Qumi
 mod_tundra            | NUM2  |
 
-+mod_auto_equip + crew auto return --> mod_hangar (mod_auto_ret
++mod_auto_equip + crew auto return --> mod_hangar (mod_auto_return)
 +mod_auto_extinguisher + mod_repair_track + repair_other --> mod_repair
 +mod_render_model --> mod_render
 +mod_shadow: check isAlive
