@@ -99,18 +99,13 @@ def onAccountShowGUI(ctx):
     global old_recreateVehicle
     if g_started: return
     g_xmlSetting = ResMgr.openSection('scripts/client/gui/mods/mod_auto_equip.xml', True)
-    if g_xmlSetting:
-        g_autoEquip = g_xmlSetting.readBool('autoEquip', True)
-        g_returnCrew = g_xmlSetting.readBool('returnCrew', True)
-    else:
-        g_xmlSetting.writeBool('autoEquip', True)
-        g_xmlSetting.writeBool('returnCrew', True)
+    if not g_xmlSetting:
         g_xmlSetting.save()
     g_prevVehicleID = g_currentVehicle.item.intCD
     old_setVehicleModule = AmmunitionPanel.setVehicleModule
     AmmunitionPanel.setVehicleModule = new_setVehicleModule
     old_recreateVehicle = ClientHangarSpace.recreateVehicle
     ClientHangarSpace.recreateVehicle = new_recreateVehicle
-    SystemMessages.pushMessage('LWP Hangar Mod 0.9.10 started')
+    SystemMessages.pushMessage('Mod AutoEquip started')
     g_started = True
 

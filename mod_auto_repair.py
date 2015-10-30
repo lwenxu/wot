@@ -22,7 +22,7 @@ g_auto_repair['lightTank'] = ['engine']
 g_auto_heal['lightTank'] = ['driver']
 g_repair_critical =  ['engine', 'ammoBay', 'gun', 'radio']
 g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
-g_xml = ResMgr.openSection('scripts/client/gui/mods/mod_repair.xml')
+g_xml = ResMgr.openSection('scripts/client/gui/mods/mod_auto_repair.xml')
 if g_xml:
     g_auto_extinguisher = g_xml.readBool('autoExtinguisher', True)
     g_key = getattr(Keys, g_xml.readString('fastRepairKey', 'KEY_SPACE'))

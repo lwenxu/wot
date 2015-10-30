@@ -1,45 +1,13 @@
 import BigWorld
-import Keys
 import GUI
 import constants
-import ResMgr
-from Avatar import PlayerAvatar
 from Vehicle import Vehicle
 from VehicleAppearance import VehicleAppearance, StippleManager, _VEHICLE_DISAPPEAR_TIME
-from gui.app_loader import g_appLoader
-from debug_utils import *
 from functools import partial
+from debug_utils import *
 
-g_active = True
-g_key = Keys.KEY_NUMPAD5
-g_delay = 20
-g_xmlConfig = ResMgr.openSection('scripts/client/gui/mods/mod_shadow.xml')
-if g_xmlConfig:
-    g_delay = g_xmlConfig.readInt('delay', g_delay)
-    if g_delay > 0:
-        g_active = g_xmlConfig.readBool('active', True)
-    else:
-        g_active = False
-    g_key = getattr(Keys, g_xmlConfig.readString('key', 'KEY_NUMPAD5'))
-    LOG_NOTE('config is loaded')
-
-def new_handleKey(self, isDown, key, mods):
-    global g_active
-    if key == g_key and mods == 0 and isDown:
-        if g_appLoader.getDefBattleApp() is not None:
-            if g_active:
-                g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Shadow OFF', 'red'])
-                g_active = False
-            else:
-                g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', 'Shadow ON', 'gold'])
-                g_active = True
-            self.soundNotifications.play('chat_shortcut_common_fx')
-            return True
-    return old_handleKey(self, isDown, key, mods)
-
-old_handleKey = PlayerAvatar.handleKey
-PlayerAvatar.handleKey = new_handleKey
-
+g_delay = 15
+g_distance = 350
 g_shadows_list = []
 
 def new_addStippleModel(self, vehID):
@@ -52,21 +20,11 @@ def new_addStippleModel(self, vehID):
     del self._StippleManager__stippleToAddDescs[vehID]
     BigWorld.player().addModel(model)
     vehicle = BigWorld.player().arena.vehicles.get(vehID)
-    if g_active and vehicle['isAlive'] and BigWorld.player().team != vehicle['team']:
+    if vehicle['isAlive'] and BigWorld.player().team != vehicle['team']:
         vehicleType = unicode(vehicle['vehicleType'].type.shortUserString, 'utf-8')
         TransBoundingBox = GUI.BoundingBox('objects/shadow/null.dds')
         TransBoundingBox.size = (0.05, 0.05)
-        my_info = '\\cFF4949FF;' + vehicleType
-        TransBoundingBox.my_string = GUI.Text(my_info)
-        TransBoundingBox.my_string.colourFormatting = True
-        TransBoundingBox.my_string.colour = (255, 0, 0, 255)
-        TransBoundingBox.my_string.font = 'hpmp_panel.font'
-        TransBoundingBox.my_string.horizontalPositionMode = TransBoundingBox.my_string.verticalPositionMode = 'CLIP'
-        TransBoundingBox.my_string.widthMode = TransBoundingBox.my_string.heightMode = 'PIXEL'
-        TransBoundingBox.my_string.verticalAnchor = 'CENTER'
-        TransBoundingBox.my_string.horizontalAnchor = 'CENTER'
         TransBoundingBox.source = model.bounds
-        TransBoundingBox.my_string.position = (0.5, 0.75, 0)
         GUI.addRoot(TransBoundingBox)
         g_shadows_list.append({'time': BigWorld.time(), 'bb': TransBoundingBox})
         BigWorld.callback(g_delay, delBoundingBox)
