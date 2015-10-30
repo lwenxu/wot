@@ -1,5 +1,4 @@
 <mod_reload.xml>
-    <key> KEY_NUMPAD4 </key>
     <allies> true </allies>
     <unvisible> true </unvisible>
     <bonusBrotherhood> true </bonusBrotherhood>

@@ -27,6 +27,6 @@ release: all
 	cp -f mod_*.pyc "$(wotmod_scripts)"
 	cp -f xml/*.xml "$(wotmod_configs)"
 	cp -rf res/* "$(wotmod)"
-	tar c res_mods/ | bzip2 -c -9 > "wotmods-$(wotver).tar.bz2"
+	zip -r res_mods/ *
 	rm -rf res_mods/
 

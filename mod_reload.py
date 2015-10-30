@@ -1,28 +1,26 @@
 import BigWorld
-import Keys
 import ResMgr
 import Vehicle
-import ProjectileMover
 from messenger import MessengerEntry
 from Avatar import PlayerAvatar
-from gui.app_loader import g_appLoader
-from gui.Scaleform.daapi.view.lobby.LobbyView import LobbyView
 from Account import PlayerAccount
 from gui import SystemMessages
 from gui.Scaleform.Battle import Battle
+from gui.app_loader import g_appLoader
 import constants
 from constants import ARENA_PERIOD
 from debug_utils import *
 from functools import partial
+
+
 SWF_FILE_NAME = 'marker_red.swf'
 
-class MarkerReLoad(object):
+class ReloadMarkers(object):
 
     def __init__(self):
-        self.name = 'MarkerReLoad'
+        self.name = 'MetaTarge'
         self.arenaPeriod = False
         self.startTime = 0
-        self.arenaGuiTyps = 0
         self.extTanks = {}
         self.visible_list = []
         self.enemies_list = {}
@@ -31,17 +29,15 @@ class MarkerReLoad(object):
         self.mod_markers = {}
         self.shoot_timer_list = {}
         self.timeOutReload = {}
-        self.configModule()
-        self.moduleMarker()
-        BigWorld.logInfo(self.name, 'mod started', None)
+        self.config()
+        self.module()
+        BigWorld.logInfo(self.name, 'mod is started', None)
 
-    def configModule(self):
-        self.disabled = False
+    def config(self):
         self.active = True
-        self.key = Keys.KEY_NUMPAD4
         self.allies = False
         self.alliesAtStart = False
-        self.unvisible = False
+        self.unvisible = True
         self.bonusBrotherhood = True
         self.bonusStimulator = False
         self.bonusAuto = True
@@ -54,11 +50,9 @@ class MarkerReLoad(object):
         self.marker_timeCorrect = 0.5
         self.config = ResMgr.openSection('scripts/client/gui/mods/mod_reload.xml')
         if self.config:
-            self.active = self.config.readBool('active', True)
-            self.key = getattr(Keys, self.config.readString('key', 'KEY_NUMPAD4'))
             self.allies = self.config.readBool('allies', False)
             self.alliesAtStart = self.config.readBool('alliesAtStart', self.allies)
-            self.unvisible = self.config.readBool('unvisible', False)
+            self.unvisible = self.config.readBool('unvisible', True)
             self.bonusBrotherhood = self.config.readBool('bonusBrotherhood', True)
             self.bonusStimulator = self.config.readBool('bonusStimulator', False)
             self.bonusAuto = self.config.readBool('bonusAuto', True)
@@ -69,63 +63,85 @@ class MarkerReLoad(object):
             self.SWF_FILE_NAME_ALLIES = self.config.readString('alliesMarker', 'marker_green.swf')
             self.marker_timeUpdate = self.config.readFloat('marker_timeUpdate', 0.5)
             self.marker_timeCorrect = self.config.readFloat('marker_timeCorrect', 0.5)
-            if not self.active:
-                LOG_WARNING('mod is inactive', None)
         else:
             LOG_WARNING('config not found')
         return
 
-    def moduleMarker(self):
+    def clear(self):
+        self.visible_list = []
+        self.enemies_list = {}
+        self.allies_list = {}
+        self.timer_list = {}
+        self.mod_markers = {}
+        self.extTanks = {}
+        self.shoot_timer_list = {}
+        self.timeOutReload = {}
+        self.startTime = 0
+
+    def module(self):
+       
+        def isRemaining(id):
+            return isBattleOn() and isAlive(id) and not isPlayer(id)
+
+        def isPlayer(id):
+            return BigWorld.player().playerVehicleID == id
+
+        def isBattleOn():
+            return hasattr(BigWorld.player(), 'arena')
+
+        def isAlive(id):
+            if isBattleOn():
+                return BigWorld.player().arena.vehicles.get(id)['isAlive']
+            else:
+                return False
+
+        def isFriend(id):
+            return isBattleOn() and BigWorld.player().arena.vehicles[BigWorld.player().playerVehicleID]['team'] == BigWorld.player().arena.vehicles[id]['team']
 
         def new_showTracer(current, shooterID, shotID, isRicochet, effectsIndex, refStartPoint, velocity, gravity, maxShotDist):
-            pre_showTracer(current, shooterID, shotID, isRicochet, effectsIndex, refStartPoint, velocity, gravity, maxShotDist)
-            if self.disabled:
-                return
-            else:
-                __Reloading__Marker_Action(shooterID)
-                return
+            old_showTracer(current, shooterID, shotID, isRicochet, effectsIndex, refStartPoint, velocity, gravity, maxShotDist)
+            __Reloading__Marker_Action(shooterID)
+
+        old_showTracer = PlayerAvatar.showTracer
+        PlayerAvatar.showTracer = new_showTracer
 
         def __Reloading__Marker_Action(id):
             global SWF_FILE_NAME
-            if self.disabled:
-                return
-            else:
-                if __Remaining(id):
-                    reload_time = __calculateReload(id)
-                    if reload_time > 1.0 and self.active:
-                        flashID = str(''.join([str(id), 'vehicleMarkersManager']))
-                        if not __getIsFriendly(id):
-                            SWF_FILE_NAME = self.SWF_FILE_NAME_ENEMIES
-                        else:
-                            SWF_FILE_NAME = self.SWF_FILE_NAME_ALLIES
-                        Mod_Marker = _VehicleMarkersManager()
-                        self.mod_markers[flashID] = Mod_Marker
-                        Mod_Marker.start(flashID)
-                        try:
-                            mm_handle = Mod_Marker.createMarker(BigWorld.entity(id))
-                            if mm_handle is not None:
-                                enout = BigWorld.time() + reload_time + self.marker_timeCorrect
-                                Mod_Marker.showActionMarker(mm_handle, 'attack', int(reload_time))
-                        except:
-                            return
-                        finally:
+            if isRemaining(id):
+                reload_time = __calculateReload(id)
+                if reload_time > 1.0 and self.active:
+                    flashID = str(''.join([str(id), 'vehicleMarkersManager']))
+                    if not isFriend(id):
+                        SWF_FILE_NAME = self.SWF_FILE_NAME_ENEMIES
+                    else:
+                        SWF_FILE_NAME = self.SWF_FILE_NAME_ALLIES
+                    Mod_Marker = _VehicleMarkersManager()
+                    self.mod_markers[flashID] = Mod_Marker
+                    Mod_Marker.start(flashID)
+                    try:
+                        mm_handle = Mod_Marker.createMarker(BigWorld.entity(id))
+                        if mm_handle is not None:
+                            enout = BigWorld.time() + reload_time + self.marker_timeCorrect
+                            Mod_Marker.showActionMarker(mm_handle, 'attack', int(reload_time))
+                    except:
+                        return
+                    finally:
 
-                            def marker_check():
-                                try:
-                                    stop_mark = True
-                                    if __Remaining(id) and self.active and not (__getIsFriendly(id) and not self.allies):
-                                        if BigWorld.time() < enout:
-                                            if self.mod_markers[flashID] == Mod_Marker:
-                                                stop_mark = False
-                                    if stop_mark or self.disabled or not self.unvisible and id not in self.visible_list:
-                                        Mod_Marker.destroy_light(flashID)
-                                    else:
-                                        BigWorld.callback(self.marker_timeUpdate, marker_check)
-                                except:
+                        def marker_check():
+                            try:
+                                stop_mark = True
+                                if isRemaining(id) and self.active and not (isFriend(id) and not self.allies):
+                                    if BigWorld.time() < enout:
+                                        if self.mod_markers[flashID] == Mod_Marker:
+                                            stop_mark = False
+                                if stop_mark or not self.unvisible and id not in self.visible_list:
                                     Mod_Marker.destroy_light(flashID)
+                                else:
+                                    BigWorld.callback(self.marker_timeUpdate, marker_check)
+                            except:
+                                Mod_Marker.destroy_light(flashID)
 
-                            marker_check()
-                return
+                        marker_check()
 
         def __GetBonus(id):
             try:
@@ -140,12 +156,11 @@ class MarkerReLoad(object):
                     if item is not None and 'Rammer' in item.name:
                         rammer_bonus = True
                         continue
-
                 bonusVBS = 0
                 if ventil_bonus:
                     bonusVBS += 5
                 arena_type = BigWorld.player().arena.guiType
-                is_prof_arena = (arena_type == constants.ARENA_GUI_TYPE.COMPANY or arena_type == constants.ARENA_GUI_TYPE.CYBERSPORT)
+                is_prof_arena = (arena_type == constants.ARENA_GUI_TYPE.COMPANY)
                 if self.bonusBrotherhood or (self.bonusAuto and is_prof_arena):
                     bonusVBS += 5
                 if self.bonusStimulator or (self.bonusAuto and is_prof_arena):
@@ -165,10 +180,10 @@ class MarkerReLoad(object):
             if id in self.shoot_timer_list:
                 timer = BigWorld.time() - self.shoot_timer_list[id]
                 veh = BigWorld.player().arena.vehicles.get(id)
-                shortUserString = veh['vehicleType'].type.shortUserString
+                #shortUserString = veh['vehicleType'].type.shortUserString
                 reloadTime = veh['vehicleType'].gun['reloadTime']
                 ammo = self.extTanks[id]['ammo']
-                if not __getIsFriendly(id):
+                if not isFriend(id):
                     self.enemies_list.update({id: {'ammo': ammo, 'time': self.shoot_timer_list[id]}})
                 else:
                     self.allies_list.update({id: {'ammo': ammo, 'time': self.shoot_timer_list[id]}})
@@ -176,7 +191,7 @@ class MarkerReLoad(object):
         def __calculateReload(id):
             try:
                 veh = BigWorld.player().arena.vehicles.get(id)
-                shortUserString = veh['vehicleType'].type.shortUserString
+                #shortUserString = veh['vehicleType'].type.shortUserString
                 reloadTime = veh['vehicleType'].gun['reloadTime']
                 bonusReloadTime = reloadTime * __GetBonus(id)
                 time = BigWorld.time()
@@ -192,7 +207,7 @@ class MarkerReLoad(object):
                                 del self.timer_list[id]
                             return reloadTimeResidue
                 if id not in self.extTanks:
-                    if not __getIsFriendly(id):
+                    if not isFriend(id):
                         self.enemies_list[id]['time'] = time
                     else:
                         self.allies_list[id]['time'] = time
@@ -203,7 +218,7 @@ class MarkerReLoad(object):
                     if id in self.timeOutReload:
                         BigWorld.cancelCallback(self.timeOutReload[id])
                     self.timeOutReload.update({id: BigWorld.callback(self.extTanks[id]['reloadTime'] * __GetBonus(id) + self.timeOutReloadDelay, partial(__timeOutNoShoot, id))})
-                if not __getIsFriendly(id):
+                if not isFriend(id):
                     ammo = self.enemies_list[id]['ammo']
                     if ammo > 1:
                         ammo -= 1
@@ -214,7 +229,7 @@ class MarkerReLoad(object):
                         if id in self.shoot_timer_list:
                             del self.shoot_timer_list[id]
                     self.enemies_list.update({id: {'ammo': ammo, 'time': time}})
-                if __getIsFriendly(id):
+                if isFriend(id):
                     ammo = self.allies_list[id]['ammo']
                     if ammo > 1:
                         ammo -= 1
@@ -229,34 +244,17 @@ class MarkerReLoad(object):
             except:
                 return 0
 
-        def __Remaining(id):
-            return __getBattleOn() and __getIsLive(id) and not __isPlayer(id)
-
-        def __isPlayer(id):
-            return BigWorld.player().playerVehicleID == id
-
-        def __getBattleOn():
-            return hasattr(BigWorld.player(), 'arena')
-
-        def __getIsLive(id):
-            return __getBattleOn() and BigWorld.player().arena.vehicles.get(id)['isAlive']
-
-        def __getIsFriendly(id):
-            return __getBattleOn() and BigWorld.player().arena.vehicles[BigWorld.player().playerVehicleID]['team'] == BigWorld.player().arena.vehicles[id]['team']
-
         def new_vehicle_onEnterWorld(current, vehicle):
-            pre_vehicle_onEnterWorld(current, vehicle)
-            if self.disabled:
-                return
+            old_vehicle_onEnterWorld(current, vehicle)
             if not self.arenaPeriod:
                 return
-            if not __getIsLive(vehicle.id) or __isPlayer(vehicle.id):
+            if not isAlive(vehicle.id) or isPlayer(vehicle.id):
                 return
             id = vehicle.id
             if id not in self.visible_list:
                 self.visible_list.append(id)
             veh = BigWorld.player().arena.vehicles.get(id)
-            shortUserString = veh['vehicleType'].type.shortUserString
+            #shortUserString = veh['vehicleType'].type.shortUserString
             reloadTime = veh['vehicleType'].gun['reloadTime']
             clip = veh['vehicleType'].gun['clip']
             burst = veh['vehicleType'].gun['burst']
@@ -272,7 +270,7 @@ class MarkerReLoad(object):
                     self.timer_list[id]['shootFlag'] = False
                     __Reloading__Marker_Action(id)
                     return
-            if not __getIsFriendly(id):
+            if not isFriend(id):
                 if id not in self.enemies_list:
                     ammo = 1
                     self.enemies_list.update({id: {'ammo': ammo, 'time': time - bonusReloadTime}})
@@ -284,7 +282,7 @@ class MarkerReLoad(object):
                         ammo = self.extTanks[id]['ammo']
                         self.enemies_list[id]['ammo'] = ammo
                         bonusReloadTime = rlt
-            if __getIsFriendly(id):
+            if isFriend(id):
                 if id not in self.allies_list:
                     ammo = 1
                     self.allies_list.update({id: {'ammo': ammo, 'time': time - bonusReloadTime}})
@@ -298,16 +296,20 @@ class MarkerReLoad(object):
                         bonusReloadTime = rlt
             if bonusReloadTime > battleTime:
                 __Reloading__Marker_Action(id)
+        
+        old_vehicle_onEnterWorld = PlayerAvatar.vehicle_onEnterWorld
+        PlayerAvatar.vehicle_onEnterWorld = new_vehicle_onEnterWorld
 
         def new_vehicle_onLeaveWorld(current, vehicle):
-            pre_vehicle_onLeaveWorld(current, vehicle)
+            old_vehicle_onLeaveWorld(current, vehicle)
             id = vehicle.id
             if id in self.visible_list:
                 self.visible_list.remove(id)
+ 
+        old_vehicle_onLeaveWorld = PlayerAvatar.vehicle_onLeaveWorld
+        PlayerAvatar.vehicle_onLeaveWorld = new_vehicle_onLeaveWorld
 
         def __onVehicleKilled(targetID, atackerID, *args):
-            if self.disabled:
-                return
             id = targetID
             if id in self.visible_list:
                 self.visible_list.remove(id)
@@ -320,53 +322,43 @@ class MarkerReLoad(object):
             if self.shoot_timer_list.has_key(id):
                 del self.shoot_timer_list[id]
 
-        def __clearVars():
-            self.visible_list = []
-            self.enemies_list = {}
-            self.allies_list = {}
-            self.timer_list = {}
-            self.mod_markers = {}
-            self.extTanks = {}
-            self.shoot_timer_list = {}
-            self.timeOutReload = {}
-            self.startTime = 0
-
         def new_startBattle(current):
             BigWorld.player().arena.onVehicleKilled += __onVehicleKilled
             self.arenaPeriod = False
-            __clearVars()
+            self.clear()
             old_startBattle(current)
+
+        old_startBattle = Battle.afterCreate
+        Battle.afterCreate = new_startBattle
 
         def new_stopBattle(current):
             BigWorld.player().arena.onVehicleKilled -= __onVehicleKilled
             self.arenaPeriod = False
-            __clearVars()
+            self.clear()
             old_stopBattle(current)
 
-        old_startBattle = Battle.afterCreate
-        Battle.afterCreate = new_startBattle
         old_stopBattle = Battle.beforeDelete
         Battle.beforeDelete = new_stopBattle
 
         def vehicles_to_list():
             for id, entityVehicle in BigWorld.entities.items():
-                if isinstance(entityVehicle, Vehicle.Vehicle) and not __isPlayer(id):
+                if isinstance(entityVehicle, Vehicle.Vehicle) and not isPlayer(id):
                     veh = BigWorld.player().arena.vehicles.get(id)
-                    shortUserString = veh['vehicleType'].type.shortUserString
+                    #shortUserString = veh['vehicleType'].type.shortUserString
                     reloadTime = veh['vehicleType'].gun['reloadTime']
                     clip = veh['vehicleType'].gun['clip']
                     if clip[0] > 1:
                         self.extTanks.update({id: {'reloadTime': reloadTime, 'clipReloadTime': clip[1], 'ammo': clip[0]}})
                     if id not in self.visible_list:
                         self.visible_list.append(id)
-                    if not __getIsFriendly(id):
+                    if not isFriend(id):
                         if id not in self.enemies_list:
                             ammo = 1
                             self.enemies_list.update({id: {'ammo': ammo, 'time': 0}})
                         if id in self.extTanks:
                             ammo = self.extTanks[id]['ammo']
                             self.enemies_list[id]['ammo'] = ammo
-                    if __getIsFriendly(id):
+                    if isFriend(id):
                         if id not in self.allies_list:
                             ammo = 1
                             self.allies_list.update({id: {'ammo': ammo, 'time': 0}})
@@ -375,7 +367,7 @@ class MarkerReLoad(object):
                             self.allies_list[id]['ammo'] = ammo
 
         def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo):
-            pre_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo)
+            old_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo)
             if period == ARENA_PERIOD.PREBATTLE:
                 vehicles_to_list()
             if period == ARENA_PERIOD.BATTLE:
@@ -385,51 +377,10 @@ class MarkerReLoad(object):
                     for id in self.allies_list:
                         __Reloading__Marker_Action(id)
 
-        pre_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
+        old_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
         PlayerAvatar._PlayerAvatar__onArenaPeriodChange = new_onArenaPeriodChange
 
-        def new_PlayerHandleKey(current, isDown, key, mods):
-            global g_appLoader
-            if key == self.key and mods == 0 and isDown:
-                if g_appLoader.getDefBattleApp() is not None:
-                    if self.active:
-                        if self.allies:
-                            self.allies = False
-                            self.active = False
-                            g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + ' OFF', 'red'])
-                        else:
-                            self.allies = True
-                            g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + 'Allies  ON', 'gold'])
-                    else:
-                        self.active = True
-                        if self.disabled:
-                            self.disabled = False
-                            vehicles_to_list()
-                        g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + ' ON', 'gold'])
-                    current.soundNotifications.play('chat_shortcut_common_fx')
-                    return True
-            elif key == self.key and mods == 2 and isDown:
-                if g_appLoader.getDefBattleApp() is not None:
-                    if not self.disabled:
-                        self.disabled = True
-                        self.active = False
-                        self.allies = False
-                        __clearVars()
-                        g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', self.name + ' DISABLED', 'red'])
-                        current.soundNotifications.play('chat_shortcut_common_fx')
-                        return True
-            return old_PlayerHandleKey(current, isDown, key, mods)
-
-        old_PlayerHandleKey = PlayerAvatar.handleKey
-        PlayerAvatar.handleKey = new_PlayerHandleKey
-        pre_vehicle_onEnterWorld = PlayerAvatar.vehicle_onEnterWorld
-        PlayerAvatar.vehicle_onEnterWorld = new_vehicle_onEnterWorld
-        pre_vehicle_onLeaveWorld = PlayerAvatar.vehicle_onLeaveWorld
-        PlayerAvatar.vehicle_onLeaveWorld = new_vehicle_onLeaveWorld
-        pre_showTracer = PlayerAvatar.showTracer
-        PlayerAvatar.showTracer = new_showTracer
-
-MRL = MarkerReLoad()
+RM = ReloadMarkers()
 
 
 import weakref
