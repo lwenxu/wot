@@ -74,8 +74,10 @@ def checkCollides():
 
 def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo):
     old_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo)
-    #if period == ARENA_PERIOD.PREBATTLE:
     if period == ARENA_PERIOD.BATTLE:
+        global g_visible_list, g_edged_list
+        g_visible_list = []
+        g_edged_list = []
         BigWorld.callback(0.2, lambda : checkCollides())
 
 old_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
