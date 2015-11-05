@@ -1,4 +1,4 @@
-<mod_repair.xml>
+<mod_auto_repair.xml>
 	<autoExtinguisher> true </autoExtinguisher>
 	<fastRepairKey> KEY_SPACE </fastRepairKey>
 
@@ -25,4 +25,4 @@
 		<autoRepair> ammoBay, gun </autoRepair>
 		<autoHeal> gunner, loader </autoHeal>
 	</AT-SPG>
-</mod_repair.xml>
+</mod_auto_repair.xml>

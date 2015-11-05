@@ -21,12 +21,14 @@ install: all
 	mkdir -p "$(WOTDIR)/$(wotmod_scripts)"
 	cp -f mod_*.pyc "$(WOTDIR)/$(wotmod_scripts)"
 	cp -rf res/* "$(WOTDIR)/$(wotmod)"
+	rm "$(WOTDIR)/$(wotmod_scripts)"/mod_lasers.pyc
+	rm "$(WOTDIR)/$(wotmod_scripts)"/mod_target.pyc
 
 release: all
 	mkdir -p "$(wotmod_scripts)"
 	cp -f mod_*.pyc "$(wotmod_scripts)"
-	cp -f xml/*.xml "$(wotmod_configs)"
+	#cp -f xml/*.xml "$(wotmod_configs)"
 	cp -rf res/* "$(wotmod)"
-	tar c res_mods/ | bzip2 -c -9 > "wotmods-$(wotver).tar.bz2"
+	zip -r lwp.zip res_mods/
 	rm -rf res_mods/
 
