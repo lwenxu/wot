@@ -6,7 +6,7 @@ sources = $(wildcard mod_*.c)
 targets = $(sources:.py=.pyc)
 
 WOTDIR = /cygdrive/c/games/WOTCT
-wotver = 0.10.0 Common Test
+wotver = 0.9.12 Common Test
 wotmod = res_mods/$(wotver)
 wotmod_scripts = $(wotmod)/scripts/client/gui/mods
 wotmod_configs = $(wotmod)/scripts/client/gui/mods
