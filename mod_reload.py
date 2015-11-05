@@ -18,7 +18,6 @@ SWF_FILE_NAME = 'marker_red.swf'
 class ReloadMarkers(object):
 
     def __init__(self):
-        self.name = 'MetaTarge'
         self.arenaPeriod = False
         self.startTime = 0
         self.extTanks = {}
@@ -31,7 +30,7 @@ class ReloadMarkers(object):
         self.timeOutReload = {}
         self.config()
         self.module()
-        BigWorld.logInfo(self.name, 'mod is started', None)
+        BigWorld.logInfo('NOTE', 'mod_reload loaded', None)
 
     def config(self):
         self.active = True

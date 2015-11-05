@@ -3,7 +3,7 @@ import ResMgr
 import Math
 import Vehicle
 from Avatar import PlayerAvatar
-from gui.Scaleform.Battle import Battle
+from constants import ARENA_PERIOD
 from gui.app_loader import g_appLoader
 from tutorial.gui.Scaleform.battle.legacy import ScaleformLayout
 from tutorial.gui.Scaleform.battle.layout import BattleLayout
@@ -37,12 +37,14 @@ def delIndicator():
 
 def addEdge(id):
     target = BigWorld.entity(id)
-    BigWorld.wgSetEdgeDetectColors((Math.Vector4(0.5, 0.5, 0.5, 1), Math.Vector4(1.0, 0.07, 0.027, 1), Math.Vector4(0.488, 0.839, 0.023, 1), Math.Vector4(0.9, 0.8, 0.1, 1)))
-    BigWorld.wgAddEdgeDetectEntity(target, 3, 2, False)
+    if target:
+        BigWorld.wgSetEdgeDetectColors((Math.Vector4(0.5, 0.5, 0.5, 1), Math.Vector4(1.0, 0.07, 0.027, 1), Math.Vector4(0.488, 0.839, 0.023, 1), Math.Vector4(0.9, 0.8, 0.1, 1)))
+        BigWorld.wgAddEdgeDetectEntity(target, 3, 2, False)
 
 def delEdge(id):
     target = BigWorld.entity(id)
-    BigWorld.wgDelEdgeDetectEntity(target)
+    if target:
+        BigWorld.wgDelEdgeDetectEntity(target)
 
 def new_targetBlur(current, prevEntity):
     old_targetBlur(current, prevEntity)
@@ -76,14 +78,10 @@ def checkCollides():
             if id not in g_target_list:
                 addEdge(id)
                 g_target_list.append(id)
-                #veh = BigWorld.player().arena.vehicles.get(id)
-                #showBattleMsg('addEdge: %s (%s): %sm' % (veh['name'], veh['vehicleType'].type.shortUserString, int(vehicleDistance(id))))
         else:
             if id in g_target_list:
                 delEdge(id)
                 g_target_list.remove(id)
-                #veh = BigWorld.player().arena.vehicles.get(id)
-                #showBattleMsg('delEdge: %s (%s): %sm' % (veh['name'], veh['vehicleType'].type.shortUserString, int(vehicleDistance(id))))
     if g_battle:
         BigWorld.callback(0.2, checkCollides)
 
@@ -121,26 +119,21 @@ def onVehicleKilled(targetID, atackerID, *args):
         g_target_list.remove(id)
         delEdge(id)
 
-def new_startBattle(current):
-    BigWorld.player().arena.onVehicleKilled += onVehicleKilled
-    old_startBattle(current)
+def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo):
+    old_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo)
     global g_visible_list, g_target_list, g_battle
-    g_visible_list[:] = []
-    g_target_list[:] = []
-    g_battle = True
-    checkCollides()
+    if period == ARENA_PERIOD.BATTLE:
+        BigWorld.player().arena.onVehicleKilled += onVehicleKilled
+        g_visible_list[:] = []
+        g_target_list[:] = []
+        g_battle = True
+        checkCollides()
+    elif period == ARENA_PERIOD.AFTERBATTLE:
+        BigWorld.player().arena.onVehicleKilled -= onVehicleKilled
+        g_battle = False
+        g_visible_list[:] = []
+        g_target_list[:] = []
 
-old_startBattle = Battle.afterCreate
-Battle.afterCreate = new_startBattle
-
-def new_stopBattle(current):
-    BigWorld.player().arena.onVehicleKilled -= onVehicleKilled
-    global g_visible_list, g_target_list, g_battle
-    g_battle = False
-    g_visible_list[:] = []
-    g_target_list[:] = []
-    old_stopBattle(current)
-
-old_stopBattle = Battle.beforeDelete
-Battle.beforeDelete = new_stopBattle
+old_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
+PlayerAvatar._PlayerAvatar__onArenaPeriodChange = new_onArenaPeriodChange
 
