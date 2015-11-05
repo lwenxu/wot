@@ -9,7 +9,6 @@ def addEdge(vehicle):
     if isinstance(vehicle, Vehicle):
         if vehicle.isStarted and not vehicle.isPlayer and vehicle.isAlive():
             if vehicle.publicInfo['team'] is not BigWorld.player().team:
-                #LOG_DEBUG("add edge %d" % vehicle.id)
                 BigWorld.wgSetEdgeDetectColors((Math.Vector4(0.5, 0.5, 0.5, 1), Math.Vector4(1.0, 0.07, 0.027, 1), Math.Vector4(0.488, 0.839, 0.023, 1), Math.Vector4(0.9, 0.8, 0.1, 1)))
                 BigWorld.wgAddEdgeDetectEntity(vehicle, 3, 2, False)
 
