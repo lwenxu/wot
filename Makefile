@@ -22,7 +22,6 @@ install: all
 	cp -f mod_*.pyc "$(WOTDIR)/$(wotmod_scripts)"
 	cp -rf res/* "$(WOTDIR)/$(wotmod)"
 	rm "$(WOTDIR)/$(wotmod_scripts)"/mod_lasers.pyc
-	rm "$(WOTDIR)/$(wotmod_scripts)"/mod_target.pyc
 
 release: all
 	mkdir -p "$(wotmod_scripts)"
