@@ -88,10 +88,9 @@ class ReloadMarkers(object):
             return hasattr(BigWorld.player(), 'arena')
 
         def isAlive(id):
-            if isBattleOn():
-                #veh = BigWorld.player().arena.vehicles.get(id)
-                #if veh: 
-                return BigWorld.player().arena.vehicles.get(id)['isAlive']
+            veh = BigWorld.player().arena.vehicles.get(id)
+            if veh:
+                return isBattleOn() and veh['isAlive']
             else:
                 return False
 
