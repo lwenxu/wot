@@ -26,7 +26,7 @@ install: all
 release: all
 	mkdir -p "$(wotmod_scripts)"
 	cp -f mod_*.pyc "$(wotmod_scripts)"
-	#cp -f xml/*.xml "$(wotmod_configs)"
+	cp -f xml/*.xml "$(wotmod_configs)"
 	cp -rf res/* "$(wotmod)"
 	zip -r lwp.zip res_mods/
 	rm -rf res_mods/

@@ -10,19 +10,23 @@
 
 	<!-- Classes specific: lightTank, mediumTank, heavyTank, AT-SPG, SPG -->
 	<lightTank>
-		<autoRepair> engine </autoRepair>
-		<autoHeal> commander, driver </autoHeal>
+		<autoRepair> engine, rightTrack, leftTrack </autoRepair>
+		<autoHeal> driver </autoHeal>
 	</lightTank>
 	<mediumTank>
-		<autoRepair> engine, ammoBay, gun </autoRepair>
-		<autoHeal> commander, driver, gunner, loader </autoHeal>
+		<autoRepair> ammoBay, gun, engine </autoRepair>
+		<autoHeal> loader, driver, gunner </autoHeal>
 	</mediumTank>
 	<heavyTank>
-		<autoRepair> ammoBay, gun </autoRepair>
-		<autoHeal> gunner, loader </autoHeal>
+		<autoRepair> ammoBay </autoRepair>
+		<autoHeal> loader, gunner </autoHeal>
 	</heavyTank>
 	<AT-SPG>
-		<autoRepair> ammoBay, gun </autoRepair>
-		<autoHeal> gunner, loader </autoHeal>
+		<autoRepair> ammoBay </autoRepair>
+		<autoHeal> loader, gunner </autoHeal>
 	</AT-SPG>
+	<SPG>
+		<autoRepair> ammoBay, gun </autoRepair>
+		<autoHeal> loader, gunner </autoHeal>
+	</SPG>
 </mod_auto_repair.xml>
