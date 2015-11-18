@@ -1,7 +1,7 @@
 import BigWorld
 import ResMgr
 import Math
-import Vehicle
+from Vehicle import Vehicle
 from Avatar import PlayerAvatar
 from constants import ARENA_PERIOD
 from gui.app_loader import g_appLoader
@@ -97,4 +97,3 @@ def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, period
 
 old_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
 PlayerAvatar._PlayerAvatar__onArenaPeriodChange = new_onArenaPeriodChange
-
