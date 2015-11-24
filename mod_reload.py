@@ -17,9 +17,9 @@ SWF_FILE_NAME = 'marker_red.swf'
 class ReloadMarkers(object):
 
     def __init__(self):
-        self.arenaPeriod = False
+        self.battlePeriod = False
         self.startTime = 0
-        self.extTanks = {}
+        self.drum_tanks = {}
         self.visible_list = []
         self.enemies_list = {}
         self.allies_list = {}
@@ -69,7 +69,7 @@ class ReloadMarkers(object):
         self.allies_list = {}
         self.timer_list = {}
         self.markers = {}
-        self.extTanks = {}
+        self.drum_tanks = {}
         self.shoot_timer_list = {}
         self.timeoutReload = {}
         self.startTime = 0
@@ -179,7 +179,7 @@ class ReloadMarkers(object):
                 timer = BigWorld.time() - self.shoot_timer_list[id]
                 veh = BigWorld.player().arena.vehicles.get(id)
                 reloadTime = veh['vehicleType'].gun['reloadTime']
-                ammo = self.extTanks[id]['ammo']
+                ammo = self.drum_tanks[id]['ammo']
                 if not isFriend(id):
                     self.enemies_list.update({id: {'ammo': ammo, 'time': self.shoot_timer_list[id]}})
                 else:
@@ -202,7 +202,7 @@ class ReloadMarkers(object):
                             if id in self.timer_list:
                                 del self.timer_list[id]
                             return reloadTimeResidue
-                if id not in self.extTanks:
+                if id not in self.drum_tanks:
                     if not isFriend(id):
                         self.enemies_list[id]['time'] = time
                     else:
@@ -213,15 +213,15 @@ class ReloadMarkers(object):
                     self.shoot_timer_list.update({id: time})
                     if id in self.timeoutReload:
                         BigWorld.cancelCallback(self.timeoutReload[id])
-                    self.timeoutReload.update({id: BigWorld.callback(self.extTanks[id]['reloadTime'] * getBonus(id) + self.timeoutReloadDelay, partial(timeoutNoShoot, id))})
+                    self.timeoutReload.update({id: BigWorld.callback(self.drum_tanks[id]['reloadTime'] * getBonus(id) + self.timeoutReloadDelay, partial(timeoutNoShoot, id))})
                 if not isFriend(id):
                     ammo = self.enemies_list[id]['ammo']
                     if ammo > 1:
                         ammo -= 1
-                        bonusReloadTime = self.extTanks[id]['clipReloadTime']
+                        bonusReloadTime = self.drum_tanks[id]['clipReloadTime']
                     else:
                         self.timer_list.update({id: {'time': time, 'shootFlag': True}})
-                        ammo = self.extTanks[id]['ammo']
+                        ammo = self.drum_tanks[id]['ammo']
                         if id in self.shoot_timer_list:
                             del self.shoot_timer_list[id]
                     self.enemies_list.update({id: {'ammo': ammo, 'time': time}})
@@ -229,10 +229,10 @@ class ReloadMarkers(object):
                     ammo = self.allies_list[id]['ammo']
                     if ammo > 1:
                         ammo -= 1
-                        bonusReloadTime = self.extTanks[id]['clipReloadTime']
+                        bonusReloadTime = self.drum_tanks[id]['clipReloadTime']
                     else:
                         self.timer_list.update({id: {'time': time, 'shootFlag': True}})
-                        ammo = self.extTanks[id]['ammo']
+                        ammo = self.drum_tanks[id]['ammo']
                         if id in self.shoot_timer_list:
                             del self.shoot_timer_list[id]
                     self.allies_list.update({id: {'ammo': ammo, 'time': time}})
@@ -242,20 +242,19 @@ class ReloadMarkers(object):
 
         def new_vehicle_onEnterWorld(current, vehicle):
             old_vehicle_onEnterWorld(current, vehicle)
-            if not self.arenaPeriod:
-                return
-            if not isAlive(vehicle.id) or isPlayer(vehicle.id):
+            if not self.battlePeriod:
                 return
             id = vehicle.id
+            if not isAlive(id) or isPlayer(id):
+                return
             if id not in self.visible_list:
                 self.visible_list.append(id)
             veh = BigWorld.player().arena.vehicles.get(id)
             reloadTime = veh['vehicleType'].gun['reloadTime']
             clip = veh['vehicleType'].gun['clip']
-            burst = veh['vehicleType'].gun['burst']
             if clip[0] > 1:
-                if id not in self.extTanks:
-                    self.extTanks.update({id: {'reloadTime': reloadTime, 'clipReloadTime': clip[1], 'ammo': clip[0]}})
+                if id not in self.drum_tanks:
+                    self.drum_tanks.update({id: {'reloadTime': reloadTime, 'clipReloadTime': clip[1], 'ammo': clip[0]}})
             time = BigWorld.time()
             battleTime = time - self.startTime
             bonusReloadTime = reloadTime * getBonus(id)
@@ -269,24 +268,24 @@ class ReloadMarkers(object):
                 if id not in self.enemies_list:
                     ammo = 1
                     self.enemies_list.update({id: {'ammo': ammo, 'time': time - bonusReloadTime}})
-                if id in self.extTanks:
+                if id in self.drum_tanks:
                     rlt = bonusReloadTime
-                    bonusReloadTime = self.extTanks[id]['clipReloadTime']
+                    bonusReloadTime = self.drum_tanks[id]['clipReloadTime']
                     timer = time - self.enemies_list[id]['time']
                     if timer >= bonusReloadTime - self.timeReloadCorrect:
-                        ammo = self.extTanks[id]['ammo']
+                        ammo = self.drum_tanks[id]['ammo']
                         self.enemies_list[id]['ammo'] = ammo
                         bonusReloadTime = rlt
             if isFriend(id):
                 if id not in self.allies_list:
                     ammo = 1
                     self.allies_list.update({id: {'ammo': ammo, 'time': time - bonusReloadTime}})
-                if id in self.extTanks:
+                if id in self.drum_tanks:
                     rlt = bonusReloadTime
-                    bonusReloadTime = self.extTanks[id]['clipReloadTime']
+                    bonusReloadTime = self.drum_tanks[id]['clipReloadTime']
                     timer = time - self.allies_list[id]['time']
                     if timer >= bonusReloadTime - self.timeReloadCorrect:
-                        ammo = self.extTanks[id]['ammo']
+                        ammo = self.drum_tanks[id]['ammo']
                         self.allies_list[id]['ammo'] = ammo
                         bonusReloadTime = rlt
             if bonusReloadTime > battleTime:
@@ -319,7 +318,7 @@ class ReloadMarkers(object):
 
         def new_startBattle(current):
             BigWorld.player().arena.onVehicleKilled += onVehicleKilled
-            self.arenaPeriod = False
+            self.battlePeriod = False
             self.clear()
             old_startBattle(current)
 
@@ -328,7 +327,7 @@ class ReloadMarkers(object):
 
         def new_stopBattle(current):
             BigWorld.player().arena.onVehicleKilled -= onVehicleKilled
-            self.arenaPeriod = False
+            self.battlePeriod = False
             self.clear()
             old_stopBattle(current)
 
@@ -342,22 +341,22 @@ class ReloadMarkers(object):
                     reloadTime = veh['vehicleType'].gun['reloadTime']
                     clip = veh['vehicleType'].gun['clip']
                     if clip[0] > 1:
-                        self.extTanks.update({id: {'reloadTime': reloadTime, 'clipReloadTime': clip[1], 'ammo': clip[0]}})
+                        self.drum_tanks.update({id: {'reloadTime': reloadTime, 'clipReloadTime': clip[1], 'ammo': clip[0]}})
                     if id not in self.visible_list:
                         self.visible_list.append(id)
                     if not isFriend(id):
                         if id not in self.enemies_list:
                             ammo = 1
                             self.enemies_list.update({id: {'ammo': ammo, 'time': 0}})
-                        if id in self.extTanks:
-                            ammo = self.extTanks[id]['ammo']
+                        if id in self.drum_tanks:
+                            ammo = self.drum_tanks[id]['ammo']
                             self.enemies_list[id]['ammo'] = ammo
                     if isFriend(id):
                         if id not in self.allies_list:
                             ammo = 1
                             self.allies_list.update({id: {'ammo': ammo, 'time': 0}})
-                        if id in self.extTanks:
-                            ammo = self.extTanks[id]['ammo']
+                        if id in self.drum_tanks:
+                            ammo = self.drum_tanks[id]['ammo']
                             self.allies_list[id]['ammo'] = ammo
 
         def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo):
@@ -365,7 +364,7 @@ class ReloadMarkers(object):
             if period == ARENA_PERIOD.PREBATTLE:
                 vehicles_to_list()
             if period == ARENA_PERIOD.BATTLE:
-                self.arenaPeriod = True
+                self.battlePeriod = True
                 self.startTime = BigWorld.time()
                 if self.alliesAtStart:
                     for id in self.allies_list:
