@@ -38,7 +38,7 @@ def isCollide(id):
     target_pos = target.appearance.modelsDesc['gun']['model'].position
     player = BigWorld.entity(BigWorld.player().playerVehicleID)
     player_pos = player.appearance.modelsDesc['gun']['model'].position
-    if BigWorld.wg_collideSegment(BigWorld.player().spaceID, target_pos, player_pos, False) == None:
+    if BigWorld.wg_collideSegment(BigWorld.player().spaceID, target_pos, player_pos, 128) == None:
         return True
     else:
         return False
