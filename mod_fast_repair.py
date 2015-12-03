@@ -16,6 +16,10 @@ g_heal_list = {} # ['commander', 'radioman', 'driver', 'gunner', 'loader']
 g_repair_critical =  ['engine', 'ammoBay', 'gun', 'radio']
 g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
 
+for classTag in vehicles.VEHICLE_CLASS_TAGS:
+    g_repair_list[classTag] = []
+    g_heal_list[classTag] = []
+
 g_xml = ResMgr.openSection('scripts/client/gui/mods/mod_fast_repair.xml')
 if g_xml:
     g_auto_extinguisher = g_xml.readBool('autoExtinguisher', True)
@@ -24,11 +28,12 @@ if g_xml:
     g_healKey = getattr(Keys, g_xml.readString('healKey', 'KEY_NONE'))
     for classTag in vehicles.VEHICLE_CLASS_TAGS:
         str_list = g_xml.readString('%s/repair' % classTag)
-        if str_list: g_repair_list[classTag] = str_list.split(',')
-        else: g_repair_list[classTag] = []
+        if str_list:
+            g_repair_list[classTag] = str_list.split(',')
         str_list = g_xml.readString('%s/heal' % classTag)
-        if str_list: g_heal_list[classTag] = str_list.split(',')
-        else: g_heal_list[classTag] = []
+        if str_list:
+            g_heal_list[classTag] = str_list.split(',')
+
 LOG_NOTE('extinguisher: %s' % g_auto_extinguisher)
 LOG_NOTE('repair: %s' % g_repair_list)
 LOG_NOTE('heal: %s' % g_heal_list)
