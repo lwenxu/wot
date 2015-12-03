@@ -2,11 +2,9 @@ lwp - light wp
 --------------
 
 mod_auto_equip:
-mod_auto_repair:
+mod_fast_repair:
 mod_reload:
 mod_shadow:
 mod_tundra:
 mod_target:
- -indicators
- -config
 
