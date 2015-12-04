@@ -94,7 +94,7 @@ def new_handleKey(self, isDown, key, mods):
         if key == g_trackRepairKey:
             for deviceName in ['rightTrack', 'leftTrack']:
                 if g_dev_state.has_key(deviceName):
-                    repair(deviceName, deviceState)
+                    repair(deviceName, g_dev_state[deviceName])
                     return True
         # fast repair
         if key == g_repairKey:
@@ -102,7 +102,7 @@ def new_handleKey(self, isDown, key, mods):
             if classTag:
                 for deviceName in g_repair_list[classTag]:
                     if g_dev_state.has_key(deviceName):
-                        repair(deviceName, deviceState)
+                        repair(deviceName, g_dev_state[deviceName])
                         return True
         # fast heal
         if key == g_healKey:
@@ -110,7 +110,7 @@ def new_handleKey(self, isDown, key, mods):
             if classTag:
                 for deviceName in g_heal_list[classTag]:
                     if g_dev_state.has_key(deviceName):
-                        heal(deviceName, deviceState)
+                        heal(deviceName, g_dev_state[deviceName])
                         return True
     return old_handleKey(self, isDown, key, mods)
 
