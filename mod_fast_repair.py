@@ -70,14 +70,14 @@ def new_as_updateDeviceStateS(self, deviceName, deviceState):
     g_dev_state[deviceName] = deviceState
 
     #auto repair
-    if g_repairKey == KEY_DEBUG:
+    if g_repairKey == Keys.KEY_DEBUG:
         classTag = getClassTag()
         if classTag:
             if deviceName in g_repair_list[classTag]:
                 repair(deviceName, deviceState)
                 return
     #auto heal
-    if g_healKey == KEY_DEBUG:
+    if g_healKey == Keys.KEY_DEBUG:
         classTag = getClassTag()
         if classTag:
             if deviceName in g_heal_list[classTag]:
