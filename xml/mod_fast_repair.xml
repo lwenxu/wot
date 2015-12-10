@@ -2,8 +2,8 @@
 
 	<autoExtinguisher> true </autoExtinguisher>
 	<trackRepairKey> KEY_SPACE </trackRepairKey>
-	<repairKey> KEY_3 </repairKey>
-	<healKey> KEY_4 </healKey>
+	<repairKey> KEY_4 </repairKey>
+	<healKey> KEY_5 </healKey>
 
 	<!-- repair: engine, ammoBay, gun, turretRotator, surveyingDevice, radio -->
 	<!-- heal: commander, radioman, driver, gunner, loader -->
