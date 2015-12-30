@@ -1,4 +1,4 @@
-import BigWorld, ResMgr, Keys
+import BigWorld, ResMgr, Keys, random
 from functools import partial
 from Avatar import PlayerAvatar
 from gui.Scaleform.daapi.view.battle.damage_panel import DamagePanel
@@ -40,7 +40,7 @@ LOG_NOTE('heal: %s' % g_heal_list)
 
 def new_as_setFireInVehicleS(self, bool):
     old_as_setFireInVehicleS(self, bool)
-    BigWorld.callback(0.01, partial(g_sessionProvider.getEquipmentsCtrl().changeSettingByTag, 'extinguisher', None, BigWorld.player()))
+    BigWorld.callback(random.random(), partial(g_sessionProvider.getEquipmentsCtrl().changeSettingByTag, 'extinguisher', None, BigWorld.player()))
     LOG_NOTE('fire extinguished')
     return
 
