@@ -14,7 +14,7 @@ g_dev_state = {}
 g_repair_list = {} # ['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
 g_heal_list = {} # ['commander', 'radioman', 'driver', 'gunner', 'loader']
 g_repair_critical =  ['engine', 'ammoBay', 'gun', 'radio']
-g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
+g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'chassis', 'rightTrack', 'leftTrack']
 
 for classTag in vehicles.VEHICLE_CLASS_TAGS:
     g_repair_list[classTag] = []
@@ -50,12 +50,12 @@ if g_auto_extinguisher:
 
 def repair(deviceName, deviceState):
     if (deviceState == 'critical' and deviceName in g_repair_critical) or (deviceState == 'destroyed' and deviceName in g_repair_destroyed):
-        BigWorld.callback(0.01, partial(g_sessionProvider.getEquipmentsCtrl().changeSettingByTag, 'repairkit', deviceName, BigWorld.player()))
+        BigWorld.callback(0, partial(g_sessionProvider.getEquipmentsCtrl().changeSettingByTag, 'repairkit', deviceName, BigWorld.player()))
         LOG_NOTE('%s repaired' % deviceName)
 
 def heal(deviceName, deviceState):
     if deviceState in ('critical', 'destroyed'):
-        BigWorld.callback(0.01, partial(g_sessionProvider.getEquipmentsCtrl().changeSettingByTag, 'medkit', deviceName, BigWorld.player()))
+        BigWorld.callback(0, partial(g_sessionProvider.getEquipmentsCtrl().changeSettingByTag, 'medkit', deviceName, BigWorld.player()))
         LOG_NOTE('%s healed' % deviceName)
 
 def getClassTag():
@@ -92,10 +92,11 @@ def new_handleKey(self, isDown, key, mods):
     if player and player.isOnArena and player.inputHandler:
         # fast track repair
         if key == g_trackRepairKey:
-            for deviceName in ['rightTrack', 'leftTrack']:
+            for deviceName in ['chassis', 'rightTrack', 'leftTrack', 'engine']:
                 if g_dev_state.has_key(deviceName):
-                    repair(deviceName, g_dev_state[deviceName])
-                    return True
+                    if g_dev_state[deviceName] == 'destroyed':
+                        repair(deviceName, g_dev_state[deviceName])
+                        return True
         # fast repair
         if key == g_repairKey:
             classTag = getClassTag()

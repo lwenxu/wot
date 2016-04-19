@@ -6,7 +6,7 @@ sources = $(wildcard mod_*.c)
 targets = $(sources:.py=.pyc)
 
 WOTDIR = wot
-wotver = 0.9.13
+wotver = 0.9.14.1
 wotmod = res_mods/$(wotver)
 wotmod_scripts = $(wotmod)/scripts/client/gui/mods
 wotmod_configs = $(wotmod)/scripts/client/gui/mods
@@ -21,7 +21,6 @@ install: all
 	mkdir -p "$(WOTDIR)/$(wotmod_scripts)"
 	cp -f mod_*.pyc "$(WOTDIR)/$(wotmod_scripts)"
 	cp -rf res/* "$(WOTDIR)/$(wotmod)"
-	rm "$(WOTDIR)/$(wotmod_scripts)"/mod_lasers.pyc
 
 release: all
 	mkdir -p "$(wotmod_scripts)"
