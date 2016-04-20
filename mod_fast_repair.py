@@ -14,7 +14,7 @@ g_dev_state = {}
 g_repair_list = {} # ['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
 g_heal_list = {} # ['commander', 'radioman', 'driver', 'gunner', 'loader']
 g_repair_critical =  ['engine', 'ammoBay', 'gun', 'radio']
-g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'chassis', 'rightTrack', 'leftTrack']
+g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
 
 for classTag in vehicles.VEHICLE_CLASS_TAGS:
     g_repair_list[classTag] = []
@@ -92,7 +92,7 @@ def new_handleKey(self, isDown, key, mods):
     if player and player.isOnArena and player.inputHandler:
         # fast track repair
         if key == g_trackRepairKey:
-            for deviceName in ['chassis', 'rightTrack', 'leftTrack', 'engine']:
+            for deviceName in ['rightTrack', 'leftTrack', 'engine']:
                 if g_dev_state.has_key(deviceName):
                     if g_dev_state[deviceName] == 'destroyed':
                         repair(deviceName, g_dev_state[deviceName])
