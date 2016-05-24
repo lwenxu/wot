@@ -3,7 +3,8 @@ import ResMgr
 from CurrentVehicle import g_currentVehicle
 from gui.Scaleform.daapi.view.lobby.hangar.AmmunitionPanel import AmmunitionPanel
 from gui.ClientHangarSpace import ClientHangarSpace, _VehicleAppearance
-from gui.shared import g_itemsCache, REQ_CRITERIA
+from gui.shared import g_itemsCache
+from gui.shared.utils.requesters import REQ_CRITERIA
 from debug_utils import *
 from gui import SystemMessages
 
@@ -108,4 +109,3 @@ def onAccountShowGUI(ctx):
     ClientHangarSpace.recreateVehicle = new_recreateVehicle
     SystemMessages.pushMessage('Mod AutoEquip started')
     g_started = True
-
