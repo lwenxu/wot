@@ -8,7 +8,7 @@ def new_onControlModeChanged(current, eMode, **args):
     global g_tundra
     old_onControlModeChanged(current, eMode, **args)
     if eMode == 'sniper':
-        BigWorld.wg_setTreeHidingRadius(750, 0)
+        BigWorld.wg_setTreeHidingRadius(1000, 0)
         BigWorld.wg_enableTreeTransparency(False)
     else:
         BigWorld.wg_enableTreeHiding(False)
@@ -26,12 +26,12 @@ def new_PlayerHandleKey(current, isDown, key, mods):
                     BigWorld.wg_setTreeHidingRadius(12, 15)
                     BigWorld.wg_enableTreeTransparency(True)
                 else:
-                    BigWorld.wg_setTreeHidingRadius(750, 0)
+                    BigWorld.wg_setTreeHidingRadius(1000, 0)
                     BigWorld.wg_enableTreeTransparency(False)
             else:
                 if isDown:
                     BigWorld.wg_enableTreeHiding(True)
-                    BigWorld.wg_setTreeHidingRadius(750, 0)
+                    BigWorld.wg_setTreeHidingRadius(1000, 0)
                     BigWorld.wg_enableTreeTransparency(False)
                 else:
                     BigWorld.wg_enableTreeHiding(False)

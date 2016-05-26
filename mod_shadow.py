@@ -13,7 +13,7 @@ g_shadows_list = []
 def new_addStippleModel(self, vehID):
     global g_shadows_list
     model = self._StippleManager__stippleToAddDescs[vehID][0]
-    if model.attached:
+    if False:
         callbackID = BigWorld.callback(0.0, partial(self._StippleManager__addStippleModel, vehID))
         self._StippleManager__stippleToAddDescs[vehID] = (model, callbackID)
         return
@@ -33,14 +33,13 @@ def new_addStippleModel(self, vehID):
         callbackID = BigWorld.callback(_VEHICLE_DISAPPEAR_TIME, partial(self._StippleManager__removeStippleModel, vehID))
     self._StippleManager__stippleDescs[vehID] = (model, callbackID)
 
+VehicleAppearance = StippleManager._StippleManager__addStippleModel
+StippleManager._StippleManager__addStippleModel = new_addStippleModel
+
 def delBoundingBox():
     global g_shadows_list
     for value in g_shadows_list:
         if BigWorld.time() - value['time'] >= g_delay:
             GUI.delRoot(value['bb'])
             g_shadows_list.remove(value)
-
-VehicleAppearance = StippleManager._StippleManager__addStippleModel
-StippleManager._StippleManager__addStippleModel = new_addStippleModel
-
 

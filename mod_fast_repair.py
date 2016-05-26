@@ -68,7 +68,6 @@ def new_as_updateDeviceStateS(self, deviceName, deviceState):
     global g_dev_state
     old_as_updateDeviceStateS(self, deviceName, deviceState)
     g_dev_state[deviceName] = deviceState
-
     #auto repair
     if g_repairKey == Keys.KEY_DEBUG:
         classTag = getClassTag()

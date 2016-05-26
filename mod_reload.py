@@ -419,6 +419,7 @@ class VehicleMarkersManager(Flash):
 
     def createMarker(self, vProxy):
         if not vProxy: return None
+        if not vProxy.model: return None
         mProv = vProxy.model.node('HP_gui')
         handle = self.__ownUI.addMarker(mProv, 'VehicleMarkerEnemy')
         self.invokeMarker(handle, 'init')

@@ -57,10 +57,16 @@ def addEdge(vehicle):
 def delEdge(vehicle):
     BigWorld.wgDelEdgeDetectEntity(vehicle)
 
+def isSniperMode():
+    player = BigWorld.player()
+    if player.inputHandler.ctrl == player.inputHandler.ctrls['sniper']:
+        return True
+    return False
+
 def new_startVisual(current):
     old_startVisual(current)
     g_vehicle_list.append(current.id)
-    if player.inputHandler.ctrl == player.inputHandler.ctrls['sniper']:
+    if isSniperMode():
         addEdge(current)
 
 old_startVisual = Vehicle.startVisual
@@ -69,7 +75,7 @@ Vehicle.startVisual = new_startVisual
 def new_stopVisual(current):
     old_stopVisual(current)
     g_vehicle_list.remove(current.id)
-    if player.inputHandler.ctrl == player.inputHandler.ctrls['sniper']:
+    if isSniperMode():
         delEdge(current)
 
 old_stopVisual = Vehicle.stopVisual
@@ -79,7 +85,7 @@ def new_targetBlur(current, prevEntity):
     global g_focused_id
     g_focused_id = -1
     old_targetBlur(current, prevEntity)
-    if player.inputHandler.ctrl == player.inputHandler.ctrls['sniper']:
+    if isSniperMode():
         addEdge(prevEntity)
 
 old_targetBlur = PlayerAvatar.targetBlur
@@ -88,7 +94,7 @@ PlayerAvatar.targetBlur = new_targetBlur
 def new_targetFocus(current, entity):
     global g_focused_id
     g_focused_id = current.id
-    if player.inputHandler.ctrl == player.inputHandler.ctrls['sniper']:
+    if isSniperMode():
         delEdge(entity)
     old_targetFocus(current, entity)
 
@@ -100,7 +106,7 @@ def onVehicleKilled(targetID, atackerID, *args):
     vehicle = BigWorld.entity(targetID)
     if vehicle and vehicle.isStarted and not vehicle.isPlayer:
         if vehicle.publicInfo['team'] is not BigWorld.player().team:
-            if player.inputHandler.ctrl == player.inputHandler.ctrls['sniper']:
+            if isSniperMode():
                 delEdge(vehicle)
 
 def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo):
