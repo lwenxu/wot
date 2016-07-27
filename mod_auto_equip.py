@@ -1,7 +1,7 @@
 import BigWorld
 import ResMgr
-from CurrentVehicle import g_currentVehicle
-from gui.Scaleform.daapi.view.lobby.hangar.AmmunitionPanel import AmmunitionPanel
+from CurrentVehicle import g_currentVehicle, g_currentPreviewVehicle
+from gui.Scaleform.daapi.view.lobby.shared.fitting_select_popover import FittingSelectPopover
 from gui.ClientHangarSpace import ClientHangarSpace, _VehicleAppearance
 from gui.shared import g_itemsCache
 from gui.shared.utils.requesters import REQ_CRITERIA
@@ -14,6 +14,8 @@ g_started = False
 g_vAppearance = None
 g_autoEquip = True
 g_returnCrew = True
+
+#LOG_DEBUG = LOG_NOTE
 
 def equipOptionalDevices(curVehicle):
     if g_xmlSetting[curVehicle.name]:
@@ -70,19 +72,24 @@ def new_recreateVehicle(self, vDesc, vState, onVehicleLoadedCallback):
     except:
         LOG_CURRENT_EXCEPTION()
 
-def saveDeviceOnVehicle(vehicle, deviceId, slotId, isRemove):
-    LOG_DEBUG('save', vehicle.name, slotId, deviceId)
-    g_xmlSetting.write(vehicle.name, '')
-    if isRemove:
-        g_xmlSetting[vehicle.name].writeInt('slot' + str(slotId + 1), 0)
-    else:
-        g_xmlSetting[vehicle.name].writeInt('slot' + str(slotId + 1), int(deviceId))
-    g_xmlSetting.save()
+def saveDeviceOnVehicle(vehicle, deviceId, slotIdx, isRemove):
+    device = g_itemsCache.items.getItemByCD(int(deviceId))
+    if device and device.isRemovable:
+        LOG_DEBUG('save', vehicle.name, slotIdx, deviceId)
+        g_xmlSetting.write(vehicle.name, '')
+        if isRemove:
+            g_xmlSetting[vehicle.name].writeInt('slot' + str(slotIdx + 1), 0)
+        else:
+            g_xmlSetting[vehicle.name].writeInt('slot' + str(slotIdx + 1), int(deviceId))
+        g_xmlSetting.save()
 
-def new_setVehicleModule(self, newId, slotIdx, oldId, isRemove):
-    old_setVehicleModule(self, newId, slotIdx, oldId, isRemove)
-    vehicle = g_currentVehicle.item
-    saveDeviceOnVehicle(vehicle, newId, slotIdx, isRemove)
+def new_setVehicleModule(self, newId, oldId, isRemove):
+    if not g_currentPreviewVehicle.isPresent():
+        slotIdx = self._FittingSelectPopover__logicProvider._slotIndex
+        LOG_DEBUG('setVehicleModule: newId=%d, oldId=%d, isRemove=%s, slotIndex=%d' % (newId, oldId, isRemove, slotIdx))
+        vehicle = g_currentVehicle.item
+        saveDeviceOnVehicle(vehicle, newId, slotIdx, isRemove)
+    old_setVehicleModule(self, newId, oldId, isRemove)
 
 init = lambda : None
 fini = lambda : None
@@ -103,9 +110,10 @@ def onAccountShowGUI(ctx):
     if not g_xmlSetting:
         g_xmlSetting.save()
     g_prevVehicleID = g_currentVehicle.item.intCD
-    old_setVehicleModule = AmmunitionPanel.setVehicleModule
-    AmmunitionPanel.setVehicleModule = new_setVehicleModule
+    old_setVehicleModule = FittingSelectPopover.setVehicleModule
+    FittingSelectPopover.setVehicleModule = new_setVehicleModule
     old_recreateVehicle = ClientHangarSpace.recreateVehicle
     ClientHangarSpace.recreateVehicle = new_recreateVehicle
-    SystemMessages.pushMessage('Mod AutoEquip started')
+    BigWorld.logInfo('NOTE', 'package loaded: mod_auto_equip', None)
     g_started = True
+

@@ -6,7 +6,7 @@ sources = $(wildcard mod_*.c)
 targets = $(sources:.py=.pyc)
 
 WOTDIR = wot
-wotver = 0.9.15
+wotver = 0.9.15.1
 wotmod = res_mods/$(wotver)
 wotmod_scripts = $(wotmod)/scripts/client/gui/mods
 wotmod_configs = $(wotmod)/scripts/client/gui/mods
