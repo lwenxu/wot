@@ -3,6 +3,7 @@ from functools import partial
 from Avatar import PlayerAvatar
 from gui.Scaleform.daapi.view.meta.DamagePanelMeta import DamagePanelMeta
 from gui.battle_control import g_sessionProvider
+from constants import ARENA_PERIOD
 from debug_utils import *
 
 g_trackRepairKey = Keys.KEY_SPACE
@@ -10,26 +11,22 @@ g_repairKey = Keys.KEY_4
 g_healKey = Keys.KEY_5
 g_dev_state = {}
 g_repair_list = ['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
-g_heal_list = ['commander', 'radioman', 'driver', 'gunner', 'loader']
-g_repair_critical =  ['engine', 'ammoBay', 'gun', 'radio']
-g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
+g_heal_list = ['commander', 'gunner1', 'gunner2', 'driver', 'loader1', 'loader2']
+g_repair_critical =  ['engine', 'ammoBay', 'gun', 'turretRotator']
+g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice']
 
 LOG_DEBUG = LOG_NOTE
 
 def repair(tag, entityName, timeout = 0.0):
     ctrl = g_sessionProvider.shared.equipments
     if ctrl is None:
-        LOG_DEBUG('mod_fast_repair: no equipments to repair')
+        LOG_DEBUG('no equipments to repair')
         return
-    #result, error = ctrl.changeSettingByTag(tag, entityName, BigWorld.player())
-    #if not result and error:
-    #    LOG_DEBUG('mod_fast_repair: something goes wrong')
-    #else:
     BigWorld.callback(timeout, partial(ctrl.changeSettingByTag, tag, entityName, BigWorld.player()))
-    LOG_DEBUG('mod_fast_repair: apply %s to %s' % (tag, entityName))
+    LOG_DEBUG('apply %s to %s' % (tag, entityName))
 
-def new_as_setFireInVehicleS(self, bool):
-    old_as_setFireInVehicleS(self, bool)
+def new_as_setFireInVehicleS(self, isInFire):
+    old_as_setFireInVehicleS(self, isInFire)
     repair('extinguisher', None, random.random());
 
 old_as_setFireInVehicleS = DamagePanelMeta.as_setFireInVehicleS
@@ -37,9 +34,9 @@ DamagePanelMeta.as_setFireInVehicleS = new_as_setFireInVehicleS
 
 def new_as_updateDeviceStateS(self, deviceName, deviceState):
     global g_dev_state
-    old_as_updateDeviceStateS(self, deviceName, deviceState)
+    LOG_DEBUG('%s ==> %s:' % (deviceName, deviceState))
     g_dev_state[deviceName] = deviceState
-    LOG_DEBUG('mod_fast_repair: %s ==> %s:' % (deviceName, deviceState))
+    old_as_updateDeviceStateS(self, deviceName, deviceState) #FIXME Exception: PyGFxValue - Failed to invoke method as_updateDeviceState
 
 old_as_updateDeviceStateS = DamagePanelMeta.as_updateDeviceStateS
 DamagePanelMeta.as_updateDeviceStateS = new_as_updateDeviceStateS
@@ -58,6 +55,7 @@ def new_handleKey(self, isDown, key, mods):
 
         # fast repair
         if key == g_repairKey:
+            LOG_DEBUG('g_dev_state: ' % g_dev_state)
             deviceToRepair = ''
             # find device to repair
             for deviceName,deviceState in g_dev_state.iteritems():
@@ -89,6 +87,19 @@ def new_handleKey(self, isDown, key, mods):
 
 old_handleKey = PlayerAvatar.handleKey
 PlayerAvatar.handleKey = new_handleKey
+
+def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo):
+    old_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo)
+    global g_dev_state
+    if period == ARENA_PERIOD.BATTLE:
+        LOG_DEBUG('ARENA_PERIOD.BATTLE')
+        g_dev_state = {}
+    elif period == ARENA_PERIOD.AFTERBATTLE:
+        LOG_DEBUG('ARENA_PERIOD.AFTERBATTLE')
+        g_dev_state = {}
+
+old_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
+PlayerAvatar._PlayerAvatar__onArenaPeriodChange = new_onArenaPeriodChange
 
 BigWorld.logInfo('NOTE', 'package loaded: mod_fast_repair', None)
 
