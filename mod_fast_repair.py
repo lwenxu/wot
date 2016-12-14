@@ -2,7 +2,8 @@ import BigWorld, ResMgr, Keys, random
 from functools import partial
 from Avatar import PlayerAvatar
 from gui.Scaleform.daapi.view.meta.DamagePanelMeta import DamagePanelMeta
-from gui.battle_control import g_sessionProvider
+from skeletons.gui.battle_session import IBattleSessionProvider
+from helpers import dependency
 from constants import ARENA_PERIOD
 from debug_utils import *
 
@@ -10,6 +11,7 @@ g_trackRepairKey = Keys.KEY_SPACE
 g_repairKey = Keys.KEY_4
 g_healKey = Keys.KEY_5
 g_dev_state = {}
+g_guiSessionProvider = dependency.descriptor(IBattleSessionProvider)
 g_repair_list = ['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack']
 g_heal_list = ['commander', 'gunner1', 'gunner2', 'driver', 'loader1', 'loader2']
 g_repair_critical =  ['engine', 'ammoBay', 'gun', 'turretRotator']
@@ -18,19 +20,21 @@ g_repair_destroyed = ['engine', 'gun', 'turretRotator', 'surveyingDevice']
 LOG_DEBUG = LOG_NOTE
 
 def repair(tag, entityName, timeout = 0.0):
-    ctrl = g_sessionProvider.shared.equipments
+    ctrl = g_guiSessionProvider.shared.equipments
     if ctrl is None:
         LOG_DEBUG('no equipments to repair')
         return
     BigWorld.callback(timeout, partial(ctrl.changeSettingByTag, tag, entityName, BigWorld.player()))
     LOG_DEBUG('apply %s to %s' % (tag, entityName))
 
+'''
 def new_as_setFireInVehicleS(self, isInFire):
     old_as_setFireInVehicleS(self, isInFire)
-    repair('extinguisher', None, random.random());
+    repair('extinguisher', None, 1 + random.random());
 
 old_as_setFireInVehicleS = DamagePanelMeta.as_setFireInVehicleS
 DamagePanelMeta.as_setFireInVehicleS = new_as_setFireInVehicleS
+'''
 
 def new_as_updateDeviceStateS(self, deviceName, deviceState):
     global g_dev_state
