@@ -1,9 +1,0 @@
-<mod_reload.xml>
-    <allies> true </allies>
-    <unvisible> true </unvisible>
-    <bonusBrotherhood> true </bonusBrotherhood>
-    <bonusStimulator> false </bonusStimulator>
-    <bonusAuto> true </bonusAuto>
-    <enemiesMarker> marker_red.swf </enemiesMarker>
-    <alliesMarker> marker_green.swf </alliesMarker>
-</mod_reload.xml>
