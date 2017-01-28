@@ -72,19 +72,19 @@ def new_handleKey(self, isDown, key, mods):
             if g_fired:
                 extinguish()
                 return True
-            devices = g_repair_fast & g_repair_destroyed
+            devices = g_repair_fast & g_damaged
             if len(devices) == 1:
                 repair(devices.pop())
                 return True
         # fast repair
         if key == g_repair_key:
-            devices = (g_damaged & g_repair_damaged) | (g_destroyed & g_repair_destroyed)
+            devices = (g_repair_damaged & g_damaged) | (g_repair_destroyed & g_destroyed)
             if len(devices) == 1:
                 repair(devices.pop())
                 return True
         # fast heal
         if key == g_heal_key:
-            devices = g_destroyed & g_heal_all
+            devices = g_heal_all & g_destroyed
             if len(devices) == 1:
                 heal(devices.pop())
                 return True
