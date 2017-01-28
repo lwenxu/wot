@@ -23,14 +23,14 @@ LOG_DEBUG = LOG_NOTE
 def repair(device):
     LOG_DEBUG('repairing %s' % device)
     g_ConsumablesPanel._ConsumablesPanel__handleEquipmentPressed(1275, device) #repairkit
-    g_damaged.remove(device)
-    g_destroyed.remove(device)
+    g_damaged.discard(device)
+    g_destroyed.discard(device)
 
 def heal(device):
     LOG_DEBUG('healing %s' % device)
     g_ConsumablesPanel._ConsumablesPanel__handleEquipmentPressed(763, device) #medkit
-    g_damaged.remove(device)
-    g_destroyed.remove(device)
+    g_damaged.discard(device)
+    g_destroyed.discard(device)
 
 def extinguish():
     g_ConsumablesPanel._ConsumablesPanel__handleEquipmentPressed(251) #extinguisher
