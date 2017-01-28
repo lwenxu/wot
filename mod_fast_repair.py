@@ -5,14 +5,14 @@ from gui.Scaleform.daapi.view.battle.shared.consumables_panel import Consumables
 from constants import ARENA_PERIOD
 from debug_utils import *
 
-g_fastKey = Keys.KEY_SPACE
-g_repairKey = Keys.KEY_4
-g_healKey = Keys.KEY_5
+g_fast_key = Keys.KEY_SPACE
+g_repair_key = Keys.KEY_4
+g_heal_key = Keys.KEY_5
 g_fired = False
 g_damaged = set([])
 g_destroyed = set([])
-g_repair_list = set(['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack'])
-g_heal_list = set(['commander', 'gunner1', 'gunner2', 'driver', 'loader1', 'loader2'])
+g_heal_all = set(['commander', 'gunner1', 'gunner2', 'driver', 'loader1', 'loader2'])
+g_repair_all = set(['engine', 'ammoBay', 'gun', 'turretRotator', 'surveyingDevice', 'radio', 'rightTrack', 'leftTrack'])
 g_repair_fast = set(['rightTrack', 'leftTrack', 'chassis'])
 g_repair_damaged =  set(['engine', 'ammoBay', 'gun', 'turretRotator'])
 g_repair_destroyed = set(['engine', 'gun', 'turretRotator', 'surveyingDevice'])
@@ -33,10 +33,10 @@ def heal(device):
     g_destroyed.discard(device)
 
 def extinguish():
+    LOG_DEBUG('extinguishing the fire')
     g_ConsumablesPanel._ConsumablesPanel__handleEquipmentPressed(251) #extinguisher
     global g_fired
     g_fired = False
-    LOG_DEBUG('fire extinguished')
 
 def new_onEquipmentAdded(self, int_cd, item):
     old_onEquipmentAdded(self, int_cd, item)
@@ -68,26 +68,23 @@ def new_handleKey(self, isDown, key, mods):
     player = BigWorld.player()
     if player and player.isOnArena and player.inputHandler:
         # fast action
-        if key == g_fastKey:
+        if key == g_fast_key:
             if g_fired:
                 extinguish()
                 return True
             devices = g_repair_fast & g_repair_destroyed
-            LOG_DEBUG('devices to repair: %s' % devices)
             if len(devices) == 1:
                 repair(devices.pop())
                 return True
         # fast repair
-        if key == g_repairKey:
+        if key == g_repair_key:
             devices = (g_damaged & g_repair_damaged) | (g_destroyed & g_repair_destroyed)
-            LOG_DEBUG('devices to repair: %s' % devices)
             if len(devices) == 1:
                 repair(devices.pop())
                 return True
         # fast heal
-        if key == g_healKey:
-            devices = g_destroyed & g_heal_list
-            LOG_DEBUG('devices to repair: %s' % devices)
+        if key == g_heal_key:
+            devices = g_destroyed & g_heal_all
             if len(devices) == 1:
                 heal(devices.pop())
                 return True
@@ -98,9 +95,7 @@ PlayerAvatar.handleKey = new_handleKey
 
 def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo):
     old_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo)
-    global g_damaged, g_destroyed
     if period == ARENA_PERIOD.BATTLE or period == ARENA_PERIOD.AFTERBATTLE:
-        LOG_DEBUG('clearing lists')
         g_damaged.clear()
         g_destroyed.clear()
 
@@ -108,4 +103,3 @@ old_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
 PlayerAvatar._PlayerAvatar__onArenaPeriodChange = new_onArenaPeriodChange
 
 BigWorld.logInfo('NOTE', 'package loaded: mod_fast_repair', None)
-
