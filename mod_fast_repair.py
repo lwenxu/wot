@@ -42,7 +42,6 @@ def new_onEquipmentAdded(self, int_cd, item):
     old_onEquipmentAdded(self, int_cd, item)
     global g_ConsumablesPanel
     g_ConsumablesPanel = self
-    LOG_DEBUG('added: %s: %s' % (int_cd, item))
 
 old_onEquipmentAdded = ConsumablesPanel._ConsumablesPanel__onEquipmentAdded
 ConsumablesPanel._ConsumablesPanel__onEquipmentAdded = new_onEquipmentAdded
