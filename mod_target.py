@@ -1,139 +1,158 @@
-import BigWorld
-import ResMgr
-import Math
-from Vehicle import Vehicle
+import BigWorld, ResMgr, Math
 from Avatar import PlayerAvatar
-from AvatarInputHandler import AvatarInputHandler
 from constants import ARENA_PERIOD
 from gui.app_loader import g_appLoader
-from tutorial.gui.Scaleform.battle.legacy import ScaleformLayout
-from tutorial.gui.Scaleform.battle.layout import BattleLayout
+from gui.Scaleform.daapi.view.battle.shared import indicators
 from debug_utils import *
+#LOG_DEBUG = LOG_NOTE
 
+g_max_distance = 300
 g_battle = False
-g_vehicle_list = []
-g_focused_id = -1
+g_target_list = []
+g_indicator = None
+g_indicator_color = ''
+g_indicator_id = 0
 
-'''
 def showBattleMsg(msg, color = 'green'):
     if g_appLoader.getDefBattleApp() is not None:
         g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', msg, color])
 
-def addIndicator(id, color = 'red'):
+def addIndicator(id, color = 'green'):
     global g_indicator
-    g_indicator = BattleLayout(ScaleformLayout)._getDirectionIndicator()
+    global g_indicator_id
+    global g_indicator_color
+    g_indicator = indicators.createDirectIndicator()
     g_indicator.setShape(color) #'red' or 'green'
     g_indicator.setDistance(vehicleDistance(id))
     g_indicator.track(BigWorld.entity(id).position)
+    g_indicator_id = id
+    g_indicator_color = color
 
-def trackIndicator(id):
-    g_indicator.setDistance(vehicleDistance(id))
-    g_indicator.track(BigWorld.entity(id).position)
+def trackIndicator():
+    g_indicator.setDistance(vehicleDistance(g_indicator_id))
+    g_indicator.track(BigWorld.entity(g_indicator_id).position)
 
 def delIndicator():
-    g_indicator.remove()
+    global g_indicator_id
+    global g_indicator_color
+    if g_indicator_id:
+        g_indicator.remove()
+        g_indicator_id = 0
+        g_indicator_color = ''
 
 def vehicleDistance(id):
     return (BigWorld.player().position - BigWorld.entity(id).position).length
 
+def vehicleGunPosition(id):
+    vehicle = BigWorld.entity(id)
+    model = vehicle.appearance.compoundModel
+    node = model.node('HP_gunFire')
+    if node:
+        gun_matr = Math.Matrix(node)
+        gun_pos = gun_matr.translation
+        return gun_pos
+    return None
+
 def isCollide(id):
-    target = BigWorld.entity(id)
-    target_pos = target.appearance.modelsDesc['gun']['model'].position
-    player = BigWorld.entity(BigWorld.player().playerVehicleID)
-    player_pos = player.appearance.modelsDesc['gun']['model'].position
-    if BigWorld.wg_collideSegment(BigWorld.player().spaceID, target_pos, player_pos, 128) == None:
-        return True
+    target_pos = vehicleGunPosition(id)
+    player_pos = vehicleGunPosition(BigWorld.player().playerVehicleID)
+    if target_pos and player_pos:
+        if BigWorld.wg_collideSegment(BigWorld.player().spaceID, target_pos, player_pos, 128) == None:
+            return True
+        else:
+            return False
     else:
         return False
-'''
 
-def addEdge(vehicle):
-    if isinstance(vehicle, Vehicle):
-        if vehicle.isStarted and not vehicle.isPlayer and vehicle.isAlive():
-            if vehicle.publicInfo['team'] is not BigWorld.player().team:
-                BigWorld.wgSetEdgeDetectColors((Math.Vector4(0.5, 0.5, 0.5, 1), Math.Vector4(1.0, 0.07, 0.027, 1), Math.Vector4(0.488, 0.839, 0.023, 1), Math.Vector4(0.9, 0.8, 0.1, 1)))
-                BigWorld.wgAddEdgeDetectEntity(vehicle, 3, 2, False)
+def checkTargets():
+    if not g_battle: return
+    red_id = 0
+    red_dist = 600
+    green_id = 0
+    green_dist = g_max_distance
 
-def delEdge(vehicle):
-    BigWorld.wgDelEdgeDetectEntity(vehicle)
+    #find nearest target
+    for id in g_target_list:
+        distance = vehicleDistance(id)
+        if distance < green_dist:
+            green_id = id
+            green_dist = distance
+        if isCollide(id):
+            LOG_DEBUG('collide: id=%s, distance=%s' % (id, int(distance)))
+            if distance < red_dist:
+                red_id = id
+                red_dist = distance
 
-def isSniperMode():
-    player = BigWorld.player()
-    if player.inputHandler.ctrl == player.inputHandler.ctrls['sniper']:
-        return True
-    return False
+    #found new red indicator
+    if red_id != 0:
+        if red_id != g_indicator_id or g_indicator_color != 'red':
+            LOG_DEBUG('found red: id=%s, distance=%s' % (red_id, int(red_dist)))
+            delIndicator()
+            addIndicator(red_id, 'red')
+        else:
+            trackIndicator()
 
-def new_startVisual(current):
-    old_startVisual(current)
-    g_vehicle_list.append(current.id)
-    if isSniperMode():
-        addEdge(current)
+    #found new green indicator
+    elif green_id != 0: 
+        if green_id != g_indicator_id or g_indicator_color != 'green':
+            LOG_DEBUG('found green: id=%s, distance=%s' % (green_id, int(green_dist)))
+            delIndicator()
+            addIndicator(green_id, 'green')
+        else:
+            trackIndicator()
+    else:
+        delIndicator()
 
-old_startVisual = Vehicle.startVisual
-Vehicle.startVisual = new_startVisual
+    BigWorld.callback(0.2, checkTargets)
 
-def new_stopVisual(current):
-    old_stopVisual(current)
-    g_vehicle_list.remove(current.id)
-    if isSniperMode():
-        delEdge(current)
+def isFriend(id):
+    return BigWorld.player().arena.vehicles[BigWorld.player().playerVehicleID]['team'] == BigWorld.player().arena.vehicles[id]['team']
 
-old_stopVisual = Vehicle.stopVisual
-Vehicle.stopVisual = new_stopVisual
+def new_vehicle_onEnterWorld(current, vehicle):
+    old_vehicle_onEnterWorld(current, vehicle)
+    if not g_battle: return
+    id = vehicle.id
+    if not isFriend(id):
+        if id not in g_target_list:
+            LOG_DEBUG('added: %s' % id)
+            g_target_list.append(id)
 
-def new_targetBlur(current, prevEntity):
-    global g_focused_id
-    g_focused_id = -1
-    old_targetBlur(current, prevEntity)
-    if isSniperMode():
-        addEdge(prevEntity)
+old_vehicle_onEnterWorld = PlayerAvatar.vehicle_onEnterWorld
+PlayerAvatar.vehicle_onEnterWorld = new_vehicle_onEnterWorld
 
-old_targetBlur = PlayerAvatar.targetBlur
-PlayerAvatar.targetBlur = new_targetBlur
+def new_vehicle_onLeaveWorld(current, vehicle):
+    old_vehicle_onLeaveWorld(current, vehicle)
+    id = vehicle.id
+    if id in g_target_list:
+        LOG_DEBUG('removed: %s' % id)
+        g_target_list.remove(id)
 
-def new_targetFocus(current, entity):
-    global g_focused_id
-    g_focused_id = current.id
-    if isSniperMode():
-        delEdge(entity)
-    old_targetFocus(current, entity)
-
-old_targetFocus = PlayerAvatar.targetFocus
-PlayerAvatar.targetFocus = new_targetFocus
+old_vehicle_onLeaveWorld = PlayerAvatar.vehicle_onLeaveWorld
+PlayerAvatar.vehicle_onLeaveWorld = new_vehicle_onLeaveWorld
 
 def onVehicleKilled(targetID, atackerID, *args):
-    g_vehicle_list.remove(targetID)
-    vehicle = BigWorld.entity(targetID)
-    if vehicle and vehicle.isStarted and not vehicle.isPlayer:
-        if vehicle.publicInfo['team'] is not BigWorld.player().team:
-            if isSniperMode():
-                delEdge(vehicle)
+    id = targetID
+    if id in g_target_list:
+        LOG_DEBUG('removed: %s' % id)
+        g_target_list.remove(id)
+        if id == g_indicator_id:
+            delIndicator()
 
 def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo):
     old_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo)
     global g_battle
+    global g_target_list
     if period == ARENA_PERIOD.BATTLE:
         BigWorld.player().arena.onVehicleKilled += onVehicleKilled
         g_battle = True
+        g_target_list = []
+        checkTargets()
     elif period == ARENA_PERIOD.AFTERBATTLE:
         BigWorld.player().arena.onVehicleKilled -= onVehicleKilled
         g_battle = False
+        g_target_list = []
+        delIndicator()
 
 old_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
 PlayerAvatar._PlayerAvatar__onArenaPeriodChange = new_onArenaPeriodChange
-
-def new_onControlModeChanged(current, eMode, **args):
-    global g_tundra
-    old_onControlModeChanged(current, eMode, **args)
-    if eMode == 'sniper':
-        for id in g_vehicle_list:
-            if id != g_focused_id:
-                addEdge(BigWorld.entity(id))
-    else:
-        for id in g_vehicle_list:
-            if id != g_focused_id:
-                delEdge(BigWorld.entity(id))
-
-old_onControlModeChanged = AvatarInputHandler.onControlModeChanged
-AvatarInputHandler.onControlModeChanged = new_onControlModeChanged
 
