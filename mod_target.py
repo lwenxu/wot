@@ -1,7 +1,6 @@
 import BigWorld, ResMgr, Math
 from Avatar import PlayerAvatar
 from constants import ARENA_PERIOD
-from gui.app_loader import g_appLoader
 from gui.Scaleform.daapi.view.battle.shared import indicators
 from debug_utils import *
 #LOG_DEBUG = LOG_NOTE
@@ -12,10 +11,6 @@ g_target_list = []
 g_indicator = None
 g_indicator_color = ''
 g_indicator_id = 0
-
-def showBattleMsg(msg, color = 'green'):
-    if g_appLoader.getDefBattleApp() is not None:
-        g_appLoader.getDefBattleApp().call('battle.PlayerMessagesPanel.ShowMessage', ['0', msg, color])
 
 def addIndicator(id, color = 'green'):
     global g_indicator
@@ -67,7 +62,7 @@ def isCollide(id):
 def checkTargets():
     if not g_battle: return
     red_id = 0
-    red_dist = 600
+    red_dist = 565
     green_id = 0
     green_dist = g_max_distance
 
