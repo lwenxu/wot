@@ -1,4 +1,4 @@
-import BigWorld, Math
+import BigWorld, Math, SoundGroups
 from Avatar import PlayerAvatar
 from constants import ARENA_PERIOD
 from gui.Scaleform.daapi.view.battle.shared import indicators
@@ -102,6 +102,9 @@ def new_vehicle_onEnterWorld(current, vehicle):
     if not g_battle: return
     id = vehicle.id
     if not isFriend(id):
+        if vehicleDistance(id) < 150:
+            sound = SoundGroups.g_instance.getSound2D('lightbulb_02')
+            BigWorld.callback(0.0, sound.play)
         if id not in g_target_list:
             LOG_DEBUG('added: %s' % id)
             g_target_list.append(id)
@@ -144,3 +147,5 @@ def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, period
 
 old_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
 PlayerAvatar._PlayerAvatar__onArenaPeriodChange = new_onArenaPeriodChange
+
+BigWorld.logInfo('NOTE', 'package loaded: mod_target', None)
