@@ -1,4 +1,4 @@
-import BigWorld, ResMgr, Math
+import BigWorld, Math
 from Avatar import PlayerAvatar
 from constants import ARENA_PERIOD
 from gui.Scaleform.daapi.view.battle.shared import indicators
@@ -60,24 +60,20 @@ def vehicleVisible(id):
 
 def checkTargets():
     if not g_battle: return
-    
     nearest_id = 0
     nearest_dist = 150
     visible_id = 0
     visible_dist = 565
-
-    #find targets
+    #find target
     for id in g_target_list:
         distance = vehicleDistance(id)
         if distance < nearest_dist:
             nearest_id = id
             nearest_dist = distance
         if vehicleVisible(id):
-            LOG_DEBUG('visible: id=%s, distance=%s' % (id, int(distance)))
             if distance < visible_dist:
                 visible_id = id
                 visible_dist = distance
-
     #found visible target
     if visible_id != 0:
         if visible_id != g_indicator_id or g_indicator_color != 'red':
@@ -86,7 +82,6 @@ def checkTargets():
             addIndicator(visible_id, visible_dist, 'red')
         else:
             trackIndicator()
-
     #found nearest target
     elif nearest_id != 0: 
         if nearest_id != g_indicator_id or g_indicator_color != 'green':
@@ -97,8 +92,7 @@ def checkTargets():
             trackIndicator()
     else:
         delIndicator()
-
-    BigWorld.callback(0.2, checkTargets)
+    BigWorld.callback(0.5, checkTargets)
 
 def isFriend(id):
     return BigWorld.player().arena.vehicles[BigWorld.player().playerVehicleID]['team'] == BigWorld.player().arena.vehicles[id]['team']
@@ -150,4 +144,3 @@ def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, period
 
 old_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
 PlayerAvatar._PlayerAvatar__onArenaPeriodChange = new_onArenaPeriodChange
-
