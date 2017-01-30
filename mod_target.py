@@ -12,13 +12,13 @@ g_indicator = None
 g_indicator_color = ''
 g_indicator_id = 0
 
-def addIndicator(id, color = 'green'):
+def addIndicator(id, distance, color = 'green'):
     global g_indicator
     global g_indicator_id
     global g_indicator_color
     g_indicator = indicators.createDirectIndicator()
     g_indicator.setShape(color) #'red' or 'green'
-    g_indicator.setDistance(vehicleDistance(id))
+    g_indicator.setDistance(distance)
     g_indicator.track(BigWorld.entity(id).position)
     g_indicator_id = id
     g_indicator_color = color
@@ -48,7 +48,7 @@ def vehicleGunPosition(id):
         return gun_pos
     return None
 
-def isCollide(id):
+def vehicleVisible(id):
     target_pos = vehicleGunPosition(id)
     player_pos = vehicleGunPosition(BigWorld.player().playerVehicleID)
     if target_pos and player_pos:
@@ -72,8 +72,8 @@ def checkTargets():
         if distance < green_dist:
             green_id = id
             green_dist = distance
-        if isCollide(id):
-            LOG_DEBUG('collide: id=%s, distance=%s' % (id, int(distance)))
+        if vehicleVisible(id):
+            LOG_DEBUG('visible: id=%s, distance=%s' % (id, int(distance)))
             if distance < red_dist:
                 red_id = id
                 red_dist = distance
@@ -83,7 +83,7 @@ def checkTargets():
         if red_id != g_indicator_id or g_indicator_color != 'red':
             LOG_DEBUG('found red: id=%s, distance=%s' % (red_id, int(red_dist)))
             delIndicator()
-            addIndicator(red_id, 'red')
+            addIndicator(red_id, red_dist, 'red')
         else:
             trackIndicator()
 
@@ -92,7 +92,7 @@ def checkTargets():
         if green_id != g_indicator_id or g_indicator_color != 'green':
             LOG_DEBUG('found green: id=%s, distance=%s' % (green_id, int(green_dist)))
             delIndicator()
-            addIndicator(green_id, 'green')
+            addIndicator(green_id, green_dist, 'green')
         else:
             trackIndicator()
     else:
