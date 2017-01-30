@@ -5,7 +5,6 @@ from gui.Scaleform.daapi.view.battle.shared import indicators
 from debug_utils import *
 #LOG_DEBUG = LOG_NOTE
 
-g_max_distance = 300
 g_battle = False
 g_target_list = []
 g_indicator = None
@@ -61,38 +60,39 @@ def vehicleVisible(id):
 
 def checkTargets():
     if not g_battle: return
-    red_id = 0
-    red_dist = 565
-    green_id = 0
-    green_dist = g_max_distance
+    
+    nearest_id = 0
+    nearest_dist = 150
+    visible_id = 0
+    visible_dist = 565
 
-    #find nearest target
+    #find targets
     for id in g_target_list:
         distance = vehicleDistance(id)
-        if distance < green_dist:
-            green_id = id
-            green_dist = distance
+        if distance < nearest_dist:
+            nearest_id = id
+            nearest_dist = distance
         if vehicleVisible(id):
             LOG_DEBUG('visible: id=%s, distance=%s' % (id, int(distance)))
-            if distance < red_dist:
-                red_id = id
-                red_dist = distance
+            if distance < visible_dist:
+                visible_id = id
+                visible_dist = distance
 
-    #found new red indicator
-    if red_id != 0:
-        if red_id != g_indicator_id or g_indicator_color != 'red':
-            LOG_DEBUG('found red: id=%s, distance=%s' % (red_id, int(red_dist)))
+    #found visible target
+    if visible_id != 0:
+        if visible_id != g_indicator_id or g_indicator_color != 'red':
+            LOG_DEBUG('found visible: id=%s, distance=%s' % (visible_id, int(visible_dist)))
             delIndicator()
-            addIndicator(red_id, red_dist, 'red')
+            addIndicator(visible_id, visible_dist, 'red')
         else:
             trackIndicator()
 
-    #found new green indicator
-    elif green_id != 0: 
-        if green_id != g_indicator_id or g_indicator_color != 'green':
-            LOG_DEBUG('found green: id=%s, distance=%s' % (green_id, int(green_dist)))
+    #found nearest target
+    elif nearest_id != 0: 
+        if nearest_id != g_indicator_id or g_indicator_color != 'green':
+            LOG_DEBUG('found nearest: id=%s, distance=%s' % (nearest_id, int(nearest_dist)))
             delIndicator()
-            addIndicator(green_id, green_dist, 'green')
+            addIndicator(nearest_id, nearest_dist, 'green')
         else:
             trackIndicator()
     else:
