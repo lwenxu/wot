@@ -1,4 +1,4 @@
-import BigWorld, Math, SoundGroups
+import BigWorld, SoundGroups, Math
 from Avatar import PlayerAvatar
 from constants import ARENA_PERIOD
 from gui.Scaleform.daapi.view.battle.shared import indicators
@@ -124,26 +124,36 @@ PlayerAvatar.vehicle_onLeaveWorld = new_vehicle_onLeaveWorld
 
 def onVehicleKilled(targetID, atackerID, *args):
     id = targetID
+    if id == BigWorld.player().playerVehicleID:
+        stopBattle()
     if id in g_target_list:
         LOG_DEBUG('removed: %s' % id)
         g_target_list.remove(id)
         if id == g_indicator_id:
             delIndicator()
 
-def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo):
-    old_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo)
+def startBattle():
     global g_battle
     global g_target_list
+    g_battle = True
+    g_target_list = []
+    checkTargets()
+
+def stopBattle():
+    global g_battle
+    global g_target_list
+    g_battle = False
+    g_target_list = []
+    delIndicator()
+
+def new_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo):
+    old_onArenaPeriodChange(current, period, periodEndTime, periodLength, periodAdditionalInfo)
     if period == ARENA_PERIOD.BATTLE:
         BigWorld.player().arena.onVehicleKilled += onVehicleKilled
-        g_battle = True
-        g_target_list = []
-        checkTargets()
+        startBattle()
     elif period == ARENA_PERIOD.AFTERBATTLE:
         BigWorld.player().arena.onVehicleKilled -= onVehicleKilled
-        g_battle = False
-        g_target_list = []
-        delIndicator()
+        stopBattle()
 
 old_onArenaPeriodChange = PlayerAvatar._PlayerAvatar__onArenaPeriodChange
 PlayerAvatar._PlayerAvatar__onArenaPeriodChange = new_onArenaPeriodChange

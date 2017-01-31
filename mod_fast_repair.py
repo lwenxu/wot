@@ -1,9 +1,10 @@
-import BigWorld, ResMgr, Keys, random
+import BigWorld, Keys
 from Avatar import PlayerAvatar
 from gui.Scaleform.daapi.view.meta.DamagePanelMeta import DamagePanelMeta
 from gui.Scaleform.daapi.view.battle.shared.consumables_panel import ConsumablesPanel
 from constants import ARENA_PERIOD
 from debug_utils import *
+#LOG_DEBUG = LOG_NOTE
 
 g_fast_key = Keys.KEY_SPACE
 g_repair_key = Keys.KEY_4
@@ -18,7 +19,6 @@ g_repair_damaged =  set(['engine', 'ammoBay', 'gun', 'turretRotator'])
 g_repair_destroyed = set(['engine', 'gun', 'turretRotator', 'surveyingDevice'])
 g_ConsumablesPanel = None
 
-LOG_DEBUG = LOG_NOTE
 
 def repair(device):
     LOG_DEBUG('repairing %s' % device)
