@@ -76,14 +76,11 @@ def checkTargets():
         delIndicator()
     BigWorld.callback(0.5, checkTargets)
 
-def isFriend(id):
-    return BigWorld.player().arena.vehicles[BigWorld.player().playerVehicleID]['team'] == BigWorld.player().arena.vehicles[id]['team']
-
 def new_vehicle_onEnterWorld(current, vehicle):
     old_vehicle_onEnterWorld(current, vehicle)
     if not g_battle: return
     id = vehicle.id
-    if not isFriend(id):
+    if vehicle.isStarted and vehicle.isAlive() and vehicle.publicInfo['team'] is not BigWorld.player().team:
         if vehicleDistance(id) < 150:
             sound = SoundGroups.g_instance.getSound2D('lightbulb_02')
             BigWorld.callback(0.0, sound.play)
