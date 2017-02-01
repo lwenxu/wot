@@ -3,7 +3,7 @@ from Avatar import PlayerAvatar
 from constants import ARENA_PERIOD
 from gui.Scaleform.daapi.view.battle.shared import indicators
 from debug_utils import *
-LOG_DEBUG = LOG_NOTE
+#LOG_DEBUG = LOG_NOTE
 
 g_battle = False
 g_target_list = []
@@ -31,6 +31,7 @@ def delIndicator():
         g_indicator_id = 0
 
 def vehicleDistance(id):
+    if not id: return 565
     return (BigWorld.player().position - BigWorld.entity(id).position).length
 
 def vehicleGunPosition(id):
@@ -44,7 +45,7 @@ def vehicleGunPosition(id):
     return None
 
 def vehicleVisible(id):
-    if vehicleDistance(id) > 565: return False
+    if vehicleDistance(id) > 564: return False
     target_pos = vehicleGunPosition(id)
     player_pos = vehicleGunPosition(BigWorld.player().playerVehicleID)
     if target_pos and player_pos:
@@ -63,7 +64,7 @@ def checkTargets():
     if not vehicles:
         visible = False
         vehicles = filter(lambda i: False if vehicleDistance(i) > 150 else True, g_target_list)
-    id = reduce(lambda i, j: i if vehicleDistance(i) < vehicleDistance(j) else j, vehicles)
+    id = reduce(lambda i, j: i if vehicleDistance(i) < vehicleDistance(j) else j, vehicles, None)
     if id:
         if id != g_indicator_id or visible != g_target_visible:
             LOG_DEBUG('found: id=%s, visible=%s, distance=%s' % (id, visible, int(vehicleDistance(id))))
