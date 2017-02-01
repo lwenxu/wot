@@ -1,21 +1,17 @@
-import BigWorld
-import ResMgr
+import BigWorld, ResMgr
 from CurrentVehicle import g_currentVehicle, g_currentPreviewVehicle
 from gui.Scaleform.daapi.view.lobby.shared.fitting_select_popover import FittingSelectPopover
 from gui.ClientHangarSpace import ClientHangarSpace, _VehicleAppearance
 from gui.shared import g_itemsCache
 from gui.shared.utils.requesters import REQ_CRITERIA
 from debug_utils import *
-from gui import SystemMessages
+#LOG_DEBUG = LOG_NOTE
 
 g_xmlSetting = None
 g_prevVehicleID = None
-g_started = False
-g_vAppearance = None
 g_autoEquip = True
 g_returnCrew = True
-
-#LOG_DEBUG = LOG_NOTE
+g_vAppearance = None
 
 def equipOptionalDevices(curVehicle):
     if g_xmlSetting[curVehicle.name]:
@@ -96,16 +92,15 @@ fini = lambda : None
 onAccountBecomePlayer = lambda : None
 onAccountBecomeNonPlayer = lambda : None
 onAvatarBecomePlayer = lambda : None
+g_gui_started = False
 
 def onAccountShowGUI(ctx):
     global g_xmlSetting
-    global g_autoEquip
-    global g_returnCrew
     global g_prevVehicleID
-    global g_started
+    global g_gui_started
     global old_setVehicleModule
     global old_recreateVehicle
-    if g_started: return
+    if g_gui_started: return
     g_xmlSetting = ResMgr.openSection('scripts/client/gui/mods/mod_auto_equip.xml', True)
     if not g_xmlSetting:
         g_xmlSetting.save()
@@ -114,6 +109,6 @@ def onAccountShowGUI(ctx):
     FittingSelectPopover.setVehicleModule = new_setVehicleModule
     old_recreateVehicle = ClientHangarSpace.recreateVehicle
     ClientHangarSpace.recreateVehicle = new_recreateVehicle
-    BigWorld.logInfo('NOTE', 'package loaded: mod_auto_equip', None)
-    g_started = True
+    g_gui_started = True
 
+BigWorld.logInfo('NOTE', 'package loaded: mod_auto_equip', None)
