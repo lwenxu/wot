@@ -3,24 +3,22 @@ from Avatar import PlayerAvatar
 from constants import ARENA_PERIOD
 from gui.Scaleform.daapi.view.battle.shared import indicators
 from debug_utils import *
-#LOG_DEBUG = LOG_NOTE
+LOG_DEBUG = LOG_NOTE
 
 g_battle = False
 g_target_list = []
 g_indicator = None
-g_indicator_color = ''
 g_indicator_id = 0
+g_target_visible = False
 
-def addIndicator(id, distance, color = 'green'):
+def addIndicator(id, color = 'green'):
     global g_indicator
     global g_indicator_id
-    global g_indicator_color
     g_indicator = indicators.createDirectIndicator()
     g_indicator.setShape(color) #'red' or 'green'
-    g_indicator.setDistance(distance)
+    g_indicator.setDistance(vehicleDistance(id))
     g_indicator.track(BigWorld.entity(id).position)
     g_indicator_id = id
-    g_indicator_color = color
 
 def trackIndicator():
     g_indicator.setDistance(vehicleDistance(g_indicator_id))
@@ -28,11 +26,9 @@ def trackIndicator():
 
 def delIndicator():
     global g_indicator_id
-    global g_indicator_color
     if g_indicator_id:
         g_indicator.remove()
         g_indicator_id = 0
-        g_indicator_color = ''
 
 def vehicleDistance(id):
     return (BigWorld.player().position - BigWorld.entity(id).position).length
@@ -48,6 +44,7 @@ def vehicleGunPosition(id):
     return None
 
 def vehicleVisible(id):
+    if vehicleDistance(id) > 565: return False
     target_pos = vehicleGunPosition(id)
     player_pos = vehicleGunPosition(BigWorld.player().playerVehicleID)
     if target_pos and player_pos:
@@ -59,38 +56,23 @@ def vehicleVisible(id):
         return False
 
 def checkTargets():
+    global g_target_visible
     if not g_battle: return
-    nearest_id = 0
-    nearest_dist = 150
-    visible_id = 0
-    visible_dist = 565
-    #find target
-    for id in g_target_list:
-        distance = vehicleDistance(id)
-        if distance < nearest_dist:
-            nearest_id = id
-            nearest_dist = distance
-        if vehicleVisible(id):
-            if distance < visible_dist:
-                visible_id = id
-                visible_dist = distance
-    #found visible target
-    if visible_id != 0:
-        if visible_id != g_indicator_id or g_indicator_color != 'red':
-            LOG_DEBUG('found visible: id=%s, distance=%s' % (visible_id, int(visible_dist)))
+    visible = True
+    vehicles = filter(vehicleVisible, g_target_list)
+    if not vehicles:
+        visible = False
+        vehicles = filter(lambda i: False if vehicleDistance(i) > 150 else True, g_target_list)
+    id = reduce(lambda i, j: i if vehicleDistance(i) < vehicleDistance(j) else j, vehicles)
+    if id:
+        if id != g_indicator_id or visible != g_target_visible:
+            LOG_DEBUG('found: id=%s, visible=%s, distance=%s' % (id, visible, int(vehicleDistance(id))))
             delIndicator()
-            addIndicator(visible_id, visible_dist, 'red')
+            addIndicator(id, 'red' if visible else 'green')
         else:
             trackIndicator()
-    #found nearest target
-    elif nearest_id != 0: 
-        if nearest_id != g_indicator_id or g_indicator_color != 'green':
-            LOG_DEBUG('found nearest: id=%s, distance=%s' % (nearest_id, int(nearest_dist)))
-            delIndicator()
-            addIndicator(nearest_id, nearest_dist, 'green')
-        else:
-            trackIndicator()
-    else:
+        g_target_visible = visible
+    else: 
         delIndicator()
     BigWorld.callback(0.5, checkTargets)
 
