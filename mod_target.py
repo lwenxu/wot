@@ -44,7 +44,7 @@ def vehicleGunPosition(id):
     return None
 
 def vehicleVisible(id):
-    if vehicleDistance(id) > 564: return False
+    if vehicleDistance(id) > 565: return False
     target_pos = vehicleGunPosition(id)
     player_pos = vehicleGunPosition(BigWorld.player().playerVehicleID)
     if target_pos and player_pos:
