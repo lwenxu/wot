@@ -31,7 +31,6 @@ def delIndicator():
         g_indicator_id = 0
 
 def vehicleDistance(id):
-    if not id: return 565
     return (BigWorld.player().position - BigWorld.entity(id).position).length
 
 def vehicleGunPosition(id):
@@ -59,12 +58,14 @@ def vehicleVisible(id):
 def checkTargets():
     global g_target_visible
     if not g_battle: return
+    id = None
     visible = True
     vehicles = filter(vehicleVisible, g_target_list)
     if not vehicles:
         visible = False
         vehicles = filter(lambda i: False if vehicleDistance(i) > 150 else True, g_target_list)
-    id = reduce(lambda i, j: i if vehicleDistance(i) < vehicleDistance(j) else j, vehicles, None)
+    if vehicles:
+        id = reduce(lambda i, j: i if vehicleDistance(i) < vehicleDistance(j) else j, vehicles)
     if id:
         if id != g_indicator_id or visible != g_target_visible:
             LOG_DEBUG('found: id=%s, visible=%s, distance=%s' % (id, visible, int(vehicleDistance(id))))
