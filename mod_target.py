@@ -83,7 +83,7 @@ def new_vehicle_onEnterWorld(current, vehicle):
     if not g_battle: return
     id = vehicle.id
     if vehicle.isStarted and vehicle.isAlive() and vehicle.publicInfo['team'] is not BigWorld.player().team:
-        if vehicleDistance(id) < 150:
+        if vehicleDistance(id) < 100:
             sound = SoundGroups.g_instance.getSound2D('lightbulb_02')
             BigWorld.callback(0.0, sound.play)
         if id not in g_target_list:

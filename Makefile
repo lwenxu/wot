@@ -3,7 +3,7 @@
 .PHONY: all clean install 
 
 wotdir = wot
-wotver = 0.9.17.0.3
+wotver = 0.9.17.1
 wotmod = res_mods/$(wotver)/scripts/client/gui/mods
 
 all:

@@ -81,7 +81,7 @@ def saveDeviceOnVehicle(vehicle, deviceId, slotIdx, isRemove):
 
 def new_setVehicleModule(self, newId, oldId, isRemove):
     if not g_currentPreviewVehicle.isPresent():
-        slotIdx = self._FittingSelectPopover__logicProvider._slotIndex
+        slotIdx = self._CommonFittingSelectPopover__logicProvider._slotIndex
         LOG_DEBUG('setVehicleModule: newId=%d, oldId=%d, isRemove=%s, slotIndex=%d' % (newId, oldId, isRemove, slotIdx))
         vehicle = g_currentVehicle.item
         saveDeviceOnVehicle(vehicle, newId, slotIdx, isRemove)
