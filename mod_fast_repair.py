@@ -71,7 +71,7 @@ def new_handleKey(self, isDown, key, mods):
             if g_fired:
                 extinguish()
                 return True
-            devices = g_repair_fast & g_damaged
+            devices = g_repair_fast & g_destroyed
             if len(devices) == 1:
                 repair(devices.pop())
                 return True
