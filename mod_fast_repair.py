@@ -23,14 +23,10 @@ g_ConsumablesPanel = None
 def repair(device):
     LOG_DEBUG('repairing %s' % device)
     g_ConsumablesPanel._ConsumablesPanel__handleEquipmentPressed(1275, device) #repairkit
-    g_damaged.discard(device)
-    g_destroyed.discard(device)
 
 def heal(device):
     LOG_DEBUG('healing %s' % device)
     g_ConsumablesPanel._ConsumablesPanel__handleEquipmentPressed(763, device) #medkit
-    g_damaged.discard(device)
-    g_destroyed.discard(device)
 
 def extinguish():
     LOG_DEBUG('extinguishing the fire')
@@ -56,8 +52,13 @@ DamagePanelMeta.as_setFireInVehicleS = new_as_setFireInVehicleS
 
 def new_as_updateDeviceStateS(self, deviceName, deviceState):
     LOG_DEBUG('%s ==> %s:' % (deviceName, deviceState))
-    if deviceState == 'critical': g_damaged.add(deviceName)
-    if deviceState == 'destroyed': g_destroyed.add(deviceName)
+    if deviceState == 'critical':
+        g_damaged.add(deviceName)
+    elif deviceState == 'destroyed':
+        g_destroyed.add(deviceName)
+    elif deviceState == 'normal':
+        g_damaged.discard(deviceName)
+        g_destroyed.discard(deviceName)
     old_as_updateDeviceStateS(self, deviceName, deviceState)
 
 old_as_updateDeviceStateS = DamagePanelMeta.as_updateDeviceStateS
