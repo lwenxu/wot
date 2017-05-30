@@ -38,7 +38,7 @@ def remove_optional_devices(current):
 
 def return_crew(current):
     if not current.isCrewFull:
-        BigWorld.player().inventory.return_crew(current.invID, None)
+        BigWorld.player().inventory.returnCrew(current.invID, None)
         LOG_DEBUG('return crew: %s' % current.name)
 
 def equip_current_vehicle():
