@@ -8,26 +8,26 @@ from skeletons.gui.shared import IItemsCache
 from helpers import dependency
 from debug_utils import *
 
-LOG_DEBUG = LOG_NOTE
+#LOG_DEBUG = LOG_NOTE
 g_settings = None
 
 def equip_optional_devices(current):
     if g_settings[current.name]:
-        for slotIdx in range(0, 3):
-            device = current.descriptor.optionalDevices[slotIdx]
+        for slot_idx in range(0, 3):
+            device = current.descriptor.optionalDevices[slot_idx]
             if not device:
-                deviceCompactDescr = g_settings[current.name].readInt('slot' + str(slotIdx + 1), 0)
-                if deviceCompactDescr is not 0:
-                    BigWorld.player().inventory.equipOptionalDevice(current.invID, deviceCompactDescr, slotIdx, False, None)
-                    LOG_DEBUG('equip', current.name, slotIdx, deviceCompactDescr)
+                device_id = read_device(current, slot_idx)
+                if device_id != -1:
+                    BigWorld.player().inventory.equipOptionalDevice(current.invID, device_id, slot_idx, False, None)
+                    LOG_DEBUG('equip: %s, slot=%d, id=%d' % (current.name, slot_idx, device_id))
 
 def remove_optional_devices_from_vehicle(vehicle):
     if vehicle and not (vehicle.isInBattle or vehicle.isLocked):
-        for slotIdx in range(0, 3):
-            device = vehicle.descriptor.optionalDevices[slotIdx]
+        for slot_idx in range(0, 3):
+            device = vehicle.descriptor.optionalDevices[slot_idx]
             if device and device.removable:
-                BigWorld.player().inventory.equipOptionalDevice(vehicle.invID, 0, slotIdx, False, None)
-                LOG_DEBUG('remove:', vehicle.name, slotIdx, device.name)
+                BigWorld.player().inventory.equipOptionalDevice(vehicle.invID, 0, slot_idx, False, None)
+                LOG_DEBUG('remove: %s, slot=%d, device=%s' % (vehicle.name, slot_idx, device.name))
 
 def remove_optional_devices(current):
     itemsCache = dependency.instance(IItemsCache)
@@ -47,34 +47,35 @@ def equip_current_vehicle():
         LOG_DEBUG('try to equip: %s' % current.name)
         remove_optional_devices(current)
         equip_optional_devices(current)
-        return_crew(current)
 
-#vehicle is changed, equip it
 def new_TmenXpPanel_onVehicleChange(*args, **kwargs):
-    equip_current_vehicle()
     old_TmenXpPanel_onVehicleChange(*args, **kwargs)
+    equip_current_vehicle()
 
 old_TmenXpPanel_onVehicleChange = TmenXpPanel._onVehicleChange
 TmenXpPanel._onVehicleChange = new_TmenXpPanel_onVehicleChange
 
-def save_device(vehicle, deviceId, slotIdx):
-    LOG_DEBUG('save', vehicle.name, slotIdx, deviceId)
+def read_device(vehicle, slot_idx):
+    return g_settings[vehicle.name].readInt('slot' + str(slot_idx + 1), -1)
+
+def save_device(vehicle, device_id, slot_idx):
+    LOG_DEBUG('save %s, slot=%d, id=%d' % (vehicle.name, slot_idx, device_id))
     g_settings.write(vehicle.name, '')
-    g_settings[vehicle.name].writeInt('slot' + str(slotIdx + 1), int(deviceId))
+    g_settings[vehicle.name].writeInt('slot' + str(slot_idx + 1), int(device_id))
     g_settings.save()
 
-#device is changed on current vehicle, save it
 def new_AmmunitionPanel_as_setDataS(self, data):
+    old_AmmunitionPanel_as_setDataS(self, data)
     vehicle = g_currentVehicle.item
     for info in data['devices']:
         if info['slotType'] == 'optionalDevice':
-            LOG_DEBUG('device: id=%d, slotIndex=%d, removable=%s' % (info['id'], info['slotIndex'], info['removable']))
-            slotIdx = info['slotIndex']
-            deviceId = info['id']
+            LOG_DEBUG('device: id=%d, slot=%d, removable=%s' % (info['id'], info['slotIndex'], info['removable']))
+            slot_idx = info['slotIndex']
+            device_id = info['id']
             if info['removable']:
                 #TODO check real changes
-                save_device(vehicle, deviceId, slotIdx)
-    old_AmmunitionPanel_as_setDataS(self, data)
+                #if device_id != read_device(vehicle, slot_idx):
+                save_device(vehicle, device_id, slot_idx)
 
 old_AmmunitionPanel_as_setDataS = AmmunitionPanel.as_setDataS
 AmmunitionPanel.as_setDataS = new_AmmunitionPanel_as_setDataS
